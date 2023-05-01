@@ -2,9 +2,25 @@ import "normalize.css"
 
 import Chart from "./components/Chart"
 import { css } from "@emotion/react"
+import { useState } from "react"
 
-// ;[1, 2, 3]
+function getRandomArray(n = 20) {
+  return Array.from(new Array(n), () => {
+    return Math.round(Math.random() * 100)
+  })
+}
+
 function App() {
+  const [data, setData] = useState(() => getRandomArray())
+
+  function handleSort() {
+    console.log("click")
+  }
+
+  function handleGenRandom() {
+    setData(getRandomArray())
+  }
+
   return (
     <div
       className="sort-viz"
@@ -15,7 +31,11 @@ function App() {
       `}
     >
       <h2>Chart</h2>
-      <Chart />
+      <div>
+        <button onClick={handleSort}>sort</button>
+        <button onClick={handleGenRandom}>random</button>
+      </div>
+      <Chart data={data} />
     </div>
   )
 }

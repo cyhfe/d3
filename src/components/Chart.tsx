@@ -3,14 +3,11 @@ import { useState } from "react"
 import { css } from "@emotion/react"
 import * as d3 from "d3"
 
-function getRandomArray(n = 20) {
-  return Array.from(new Array(n), () => {
-    return Math.round(Math.random() * 100)
-  })
+interface ChartProps {
+  data: number[]
 }
-function Chart() {
-  const [data, setData] = useState(() => getRandomArray())
 
+function Chart({ data }: ChartProps) {
   const viewWidth = 500
   const viewHeight = 250
   const margin = {
@@ -41,7 +38,6 @@ function Chart() {
 
   const count = Math.min(data.length, 10)
   const ticks = d3.ticks(0, data.length - 1, count)
-  console.log(yTicks)
 
   return (
     <div>
@@ -110,6 +106,18 @@ function Chart() {
               </g>
             )
           })}
+          <g>
+            <text
+              x={-innerHeight / 2}
+              y={-25}
+              textAnchor="middle"
+              alignmentBaseline="baseline"
+              fontSize={10}
+              transform={"rotate(-90)"}
+            >
+              Value
+            </text>
+          </g>
         </g>
 
         {/* {柱状图} */}
@@ -126,11 +134,6 @@ function Chart() {
             )
           })}
         </g>
-
-        {/* xaxis
-        yaxis
-        shape
-        label */}
       </ChartContainer>
     </div>
   )
