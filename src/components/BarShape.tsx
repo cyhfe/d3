@@ -18,7 +18,7 @@ function BarShape({ data, innerHeight, xScale, yScale }: BarShapeProps) {
 
       const enterTransition = updateTransition.transition().duration(600);
 
-      const mergeTransition = enterTransition.transition().duration(100);
+      const mergeTransition = enterTransition.transition().duration(200);
 
       const rects = d3.select(barGroup.current).selectAll("rect");
 
@@ -43,12 +43,11 @@ function BarShape({ data, innerHeight, xScale, yScale }: BarShapeProps) {
             return update
               .attr("y", (d) => yScale(d))
               .attr("height", (d) => innerHeight - yScale(d))
-              .attr("fill", color.update)
               .call((update) =>
                 update
+                  .attr("fill", color.update)
                   .transition(updateTransition)
                   .attr("x", (_, i) => xScale(String(i)) as number)
-                  .attr("fill", color.update)
               );
           },
           (exit) => {
