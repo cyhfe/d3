@@ -22,7 +22,6 @@ function generateNonDuplicateArray(count: number) {
 
 function App() {
   const [data, setData] = useState(() => generateNonDuplicateArray(20));
-  const dataRef = useRef(data);
 
   const [isSorting, setIsSorting] = useState(false);
   const [startSorting, setStartSorting] = useState(false);
@@ -42,11 +41,23 @@ function App() {
             arr[j] = arr[j + 1];
             arr[j + 1] = tmp;
 
-            // console.log(isSorting, startSorting, isSortingRef.current);
             if (stopSortRef.current) break;
+
+            // 交给web api 执行定时器,时间到了就把回调放入 event loop
+            // 这会导致连续调用 setData
+
+            // setTimeout(() => {
+            //   setData((prev) => {
+            //     console.log("1");
+            //     const next = [...prev];
+            //     [next[j], next[j + 1]] = [next[j + 1], next[j]];
+            //     return next;
+            //   });
+            // }, 500);
+
+            // 我们想要的效果是执行完 setData 再重新定义计时器
             await sleep(500);
             setData((prev) => {
-              // 使用函数式更新
               const next = [...prev];
               [next[j], next[j + 1]] = [next[j + 1], next[j]];
               return next;
@@ -103,7 +114,9 @@ function App() {
     >
       <h2>Chart</h2>
       <div>
-        <button onClick={handleSort}>sort</button>
+        <button onClick={handleSort}>
+          {isSorting ? "stop" : "start"} sort
+        </button>
         <button onClick={handleShuffle}>suffle</button>
         <button onClick={handleGenRandom}>random</button>
       </div>

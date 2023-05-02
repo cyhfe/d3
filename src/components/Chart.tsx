@@ -1,43 +1,43 @@
-import ChartContainer from "./ChartContainer"
-import { useState } from "react"
-import { css } from "@emotion/react"
-import * as d3 from "d3"
-import BarShape from "./BarShape"
+import ChartContainer from "./ChartContainer";
+import { useState } from "react";
+import { css } from "@emotion/react";
+import * as d3 from "d3";
+import BarShape from "./BarShape";
 interface ChartProps {
-  data: number[]
+  data: number[];
 }
 
 function Chart({ data }: ChartProps) {
-  const viewWidth = 500
-  const viewHeight = 250
+  const viewWidth = 500;
+  const viewHeight = 250;
   const margin = {
     top: 50,
     bottom: 50,
     left: 50,
     right: 50,
-  }
+  };
 
-  const innerWidth = viewWidth - margin.left - margin.right
-  const innerHeight = viewHeight - margin.top - margin.bottom
+  const innerWidth = viewWidth - margin.left - margin.right;
+  const innerHeight = viewHeight - margin.top - margin.bottom;
 
-  const xDomain = Array.from(d3.range(0, data.length), (n) => String(n))
+  const xDomain = Array.from(d3.range(0, data.length), (n) => String(n));
 
   const xScale = d3
     .scaleBand()
     .domain(xDomain)
     .range([0, innerWidth])
-    .padding(0.2)
+    .padding(0.2);
 
   const yScale = d3
     .scaleLinear()
     .domain([0, 100])
     .range([innerHeight, 0])
-    .nice()
+    .nice();
 
-  const yTicks = yScale.ticks(10)
+  const yTicks = yScale.ticks(10);
 
-  const count = Math.min(data.length, 10)
-  const ticks = d3.ticks(0, data.length - 1, count)
+  const count = Math.min(data.length, 10);
+  const ticks = d3.ticks(0, data.length - 1, count);
 
   return (
     <div>
@@ -51,7 +51,7 @@ function Chart({ data }: ChartProps) {
           <line x1={0} y1={0} x2={innerWidth} y2={0} stroke="black" />
           {ticks.map((t) => {
             const offset =
-              (xScale(String(t)) as number) + xScale.bandwidth() / 2
+              (xScale(String(t)) as number) + xScale.bandwidth() / 2;
             return (
               <g key={t} transform={`translate(${offset}, 0)`}>
                 <text
@@ -65,7 +65,7 @@ function Chart({ data }: ChartProps) {
                 </text>
                 <line x1={0} y1={0} x2={0} y2={3} stroke="black"></line>
               </g>
-            )
+            );
           })}
 
           {/* label */}
@@ -104,7 +104,7 @@ function Chart({ data }: ChartProps) {
                 </text>
                 <line x1={0} y1={0} x2={-3} y2={0} stroke="black" />
               </g>
-            )
+            );
           })}
           <g>
             <text
@@ -129,7 +129,7 @@ function Chart({ data }: ChartProps) {
         />
       </ChartContainer>
     </div>
-  )
+  );
 }
 
-export default Chart
+export default Chart;

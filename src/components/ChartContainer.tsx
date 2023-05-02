@@ -1,18 +1,18 @@
-import { css } from "@emotion/react"
+import { css } from "@emotion/react";
 interface Margin {
-  top: number
-  left: number
-  bottom: number
-  right: number
+  top: number;
+  left: number;
+  bottom: number;
+  right: number;
 }
 
 interface ChartContainerProps extends React.ComponentPropsWithoutRef<"svg"> {
-  children?: React.ReactNode
-  width?: number
-  height?: number
-  viewWidth: number
-  viewHeight: number
-  margin: Margin
+  children?: React.ReactNode;
+  width?: number;
+  height?: number;
+  viewWidth: number;
+  viewHeight: number;
+  margin: Margin;
 }
 
 function ChartContainer({
@@ -36,7 +36,7 @@ function ChartContainer({
     >
       <g transform={`translate(${margin.left}, ${margin.top})`}>{children}</g>
     </svg>
-  )
+  );
 }
 
-export default ChartContainer
+export default ChartContainer;

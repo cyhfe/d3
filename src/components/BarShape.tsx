@@ -1,25 +1,23 @@
-import * as d3 from "d3"
-import { useCallback, useEffect, useRef } from "react"
+import * as d3 from "d3";
+import { useCallback, useEffect, useRef } from "react";
 interface BarShapeProps {
-  data: number[]
-  innerHeight: number
-  yScale: d3.ScaleLinear<number, number, never>
-  xScale: d3.ScaleBand<string>
+  data: number[];
+  innerHeight: number;
+  yScale: d3.ScaleLinear<number, number, never>;
+  xScale: d3.ScaleBand<string>;
 }
 function BarShape({ data, innerHeight, xScale, yScale }: BarShapeProps) {
-  const barGroup = useRef<SVGGElement | null>(null)
+  const barGroup = useRef<SVGGElement | null>(null);
 
   const draw = useCallback(
     function draw() {
-      console.log("draw")
+      const exitTransition = d3.transition().duration(600);
 
-      const exitTransition = d3.transition().duration(600)
+      const updateTransition = exitTransition.transition().duration(600);
 
-      const updateTransition = exitTransition.transition().duration(600)
+      const enterTransition = updateTransition.transition().duration(600);
 
-      const enterTransition = updateTransition.transition().duration(600)
-
-      const rects = d3.select(barGroup.current).selectAll("rect")
+      const rects = d3.select(barGroup.current).selectAll("rect");
 
       rects
         .data(data, (d) => d as number)
@@ -48,32 +46,25 @@ function BarShape({ data, innerHeight, xScale, yScale }: BarShapeProps) {
                   .attr("x", (_, i) => xScale(String(i)) as number)
               ),
           (exit) => {
-            console.log(exit)
-
-            return (
+            return exit.call((exit) =>
               exit
-                // .attr("y", (d) => yScale(d))
-                // .attr("height", (d) => innerHeight - yScale(d))
-                .call((exit) =>
-                  exit
-                    .transition(exitTransition)
-                    .attr("y", innerHeight)
-                    .attr("height", 0)
-                    .attr("fill", "red")
-                    .remove()
-                )
-            )
+                .transition(exitTransition)
+                .attr("y", innerHeight)
+                .attr("height", 0)
+                .attr("fill", "red")
+                .remove()
+            );
           }
-        )
+        );
 
-      return rects
+      return rects;
     },
     [data, innerHeight, xScale, yScale]
-  )
+  );
 
   useEffect(() => {
-    draw()
-  }, [data, draw, innerHeight, xScale, yScale])
+    draw();
+  }, [data, draw, innerHeight, xScale, yScale]);
   return (
     <g className="bar-shape" ref={barGroup}>
       {/* {data.map((n, i) => {
@@ -88,7 +79,7 @@ function BarShape({ data, innerHeight, xScale, yScale }: BarShapeProps) {
         )
       })} */}
     </g>
-  )
+  );
 }
 
-export default BarShape
+export default BarShape;
