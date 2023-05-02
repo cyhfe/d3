@@ -26,6 +26,7 @@ function App() {
 
   const [isSorting, setIsSorting] = useState(false);
   const [startSorting, setStartSorting] = useState(false);
+  const stopSortRef = useRef(false);
 
   useEffect(() => {
     if (!startSorting) return;
@@ -40,8 +41,9 @@ function App() {
             const tmp = arr[j];
             arr[j] = arr[j + 1];
             arr[j + 1] = tmp;
-            console.log(isSorting, startSorting);
 
+            // console.log(isSorting, startSorting, isSortingRef.current);
+            if (stopSortRef.current) break;
             await sleep(500);
             setData((prev) => {
               // 使用函数式更新
@@ -52,8 +54,9 @@ function App() {
           }
         }
       }
-      setStartSorting(false);
       setIsSorting(false);
+      setStartSorting(false);
+      stopSortRef.current = false;
     }
     if (startSorting && !isSorting) {
       setIsSorting(true);
@@ -66,19 +69,22 @@ function App() {
   }
 
   function handleSort() {
-    setStartSorting((b) => !b);
+    if (isSorting) {
+      stopSortRef.current = true;
+    } else {
+      setStartSorting(true);
+    }
   }
 
   function handleShuffle() {
-    setIsSorting(false);
-    setStartSorting(false);
+    if (isSorting) {
+      stopSortRef.current = true;
+    }
 
     const next = d3.shuffle([...data]);
     setData(next);
   }
   function handleGenRandom() {
-    setIsSorting(false);
-    setStartSorting(false);
     const next = generateNonDuplicateArray(20);
     setData(next);
   }
