@@ -85,6 +85,9 @@ function App() {
     setData(next);
   }
   function handleGenRandom() {
+    if (isSorting) {
+      stopSortRef.current = true;
+    }
     const next = generateNonDuplicateArray(20);
     setData(next);
   }
