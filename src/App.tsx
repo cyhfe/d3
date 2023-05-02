@@ -3,22 +3,37 @@ import "normalize.css"
 import Chart from "./components/Chart"
 import { css } from "@emotion/react"
 import { useState } from "react"
+import * as d3 from "d3"
+function generateNonDuplicateArray(count: number) {
+  const array = []
+  for (let i = 0; i < 100; i++) {
+    array.push(i)
+  }
 
-function getRandomArray(n = 20) {
-  return Array.from(new Array(n), () => {
-    return Math.round(Math.random() * 100)
-  })
+  const result = []
+  for (let i = 0; i < count; i++) {
+    const index = Math.floor(Math.random() * array.length)
+    result.push(array[index])
+    array.splice(index, 1)
+  }
+
+  return result
 }
 
 function App() {
-  const [data, setData] = useState(() => getRandomArray())
+  const [data, setData] = useState(() => generateNonDuplicateArray(20))
 
   function handleSort() {
     console.log("click")
   }
 
+  function handleShuffle() {
+    const next = d3.shuffle([...data])
+    setData(next)
+  }
   function handleGenRandom() {
-    setData(getRandomArray())
+    const next = generateNonDuplicateArray(20)
+    setData(next)
   }
 
   return (
@@ -33,6 +48,7 @@ function App() {
       <h2>Chart</h2>
       <div>
         <button onClick={handleSort}>sort</button>
+        <button onClick={handleShuffle}>suffle</button>
         <button onClick={handleGenRandom}>random</button>
       </div>
       <Chart data={data} />

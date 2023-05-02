@@ -2,7 +2,7 @@ import ChartContainer from "./ChartContainer"
 import { useState } from "react"
 import { css } from "@emotion/react"
 import * as d3 from "d3"
-
+import BarShape from "./BarShape"
 interface ChartProps {
   data: number[]
 }
@@ -121,19 +121,12 @@ function Chart({ data }: ChartProps) {
         </g>
 
         {/* {柱状图} */}
-        <g className="shape">
-          {data.map((n, i) => {
-            return (
-              <rect
-                key={i}
-                x={xScale(String(i))}
-                y={yScale(n)}
-                width={xScale.bandwidth()}
-                height={innerHeight - yScale(n)}
-              />
-            )
-          })}
-        </g>
+        <BarShape
+          data={data}
+          innerHeight={innerHeight}
+          xScale={xScale}
+          yScale={yScale}
+        />
       </ChartContainer>
     </div>
   )
