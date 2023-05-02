@@ -1,5 +1,6 @@
 import * as d3 from "d3";
 import { useCallback, useEffect, useRef } from "react";
+import { color } from "../color";
 interface BarShapeProps {
   data: number[];
   innerHeight: number;
@@ -17,6 +18,8 @@ function BarShape({ data, innerHeight, xScale, yScale }: BarShapeProps) {
 
       const enterTransition = updateTransition.transition().duration(600);
 
+      const mergeTransition = enterTransition.transition().duration(100);
+
       const rects = d3.select(barGroup.current).selectAll("rect");
 
       rects
@@ -29,35 +32,38 @@ function BarShape({ data, innerHeight, xScale, yScale }: BarShapeProps) {
               .attr("y", innerHeight)
               .attr("width", xScale.bandwidth())
               .attr("height", 0)
+              .attr("fill", color.enter)
               .call((enter) =>
                 enter
                   .transition(enterTransition)
                   .attr("y", (d) => yScale(d))
                   .attr("height", (d) => innerHeight - yScale(d))
               ),
-
-          (update) =>
-            update
+          (update) => {
+            return update
               .attr("y", (d) => yScale(d))
               .attr("height", (d) => innerHeight - yScale(d))
+              .attr("fill", color.update)
               .call((update) =>
                 update
                   .transition(updateTransition)
                   .attr("x", (_, i) => xScale(String(i)) as number)
-              ),
+                  .attr("fill", color.update)
+              );
+          },
           (exit) => {
             return exit.call((exit) =>
               exit
                 .transition(exitTransition)
                 .attr("y", innerHeight)
                 .attr("height", 0)
-                .attr("fill", "red")
+                .attr("fill", color.exit)
                 .remove()
             );
           }
-        );
-
-      return rects;
+        )
+        .transition(mergeTransition)
+        .attr("fill", color.enter);
     },
     [data, innerHeight, xScale, yScale]
   );
