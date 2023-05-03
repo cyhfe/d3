@@ -29,9 +29,6 @@ function ChartContainer({
       width={width}
       height={height}
       viewBox={`0, 0, ${viewWidth}, ${viewHeight}`}
-      css={css`
-        outline: 1px solid blue;
-      `}
       {...rest}
     >
       <g transform={`translate(${margin.left}, ${margin.top})`}>{children}</g>

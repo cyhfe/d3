@@ -1,5 +1,5 @@
 import ChartContainer from "./ChartContainer";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { css } from "@emotion/react";
 import * as d3 from "d3";
 import BarShape from "./BarShape";
@@ -7,32 +7,39 @@ interface ChartProps {
   data: number[];
 }
 
+const lineStyle = css`
+  stroke: #888b8d;
+`;
+
+const textStyle = css`
+  font-size: 10px;
+  fill: #374f5e;
+`;
+
 function Chart({ data }: ChartProps) {
   const viewWidth = 500;
   const viewHeight = 250;
   const margin = {
-    top: 50,
-    bottom: 50,
-    left: 50,
-    right: 50,
+    top: 30,
+    bottom: 40,
+    left: 60,
+    right: 30,
   };
 
   const innerWidth = viewWidth - margin.left - margin.right;
   const innerHeight = viewHeight - margin.top - margin.bottom;
 
-  const xDomain = Array.from(d3.range(0, data.length), (n) => String(n));
+  const xDomain = useMemo(() => {
+    return Array.from(d3.range(0, data.length), (n) => String(n));
+  }, [data.length]);
 
-  const xScale = d3
-    .scaleBand()
-    .domain(xDomain)
-    .range([0, innerWidth])
-    .padding(0.2);
+  const xScale = useMemo(() => {
+    return d3.scaleBand().domain(xDomain).range([0, innerWidth]).padding(0.2);
+  }, [innerWidth, xDomain]);
 
-  const yScale = d3
-    .scaleLinear()
-    .domain([0, 100])
-    .range([innerHeight, 0])
-    .nice();
+  const yScale = useMemo(() => {
+    return d3.scaleLinear().domain([0, 100]).range([innerHeight, 0]).nice();
+  }, [innerHeight]);
 
   const yTicks = yScale.ticks(10);
 
@@ -40,7 +47,15 @@ function Chart({ data }: ChartProps) {
   const ticks = d3.ticks(0, data.length - 1, count);
 
   return (
-    <div>
+    <div
+      css={css`
+        margin: 10px 0;
+        padding: 30px 20px;
+        background-color: #fff;
+        border-radius: 5px;
+        box-shadow: 1px 1px 10px rgba(0, 0, 0, 0.15);
+      `}
+    >
       <ChartContainer
         viewWidth={viewWidth}
         viewHeight={viewHeight}
@@ -48,7 +63,14 @@ function Chart({ data }: ChartProps) {
       >
         {/* x 轴 */}
         <g transform={`translate(0, ${innerHeight})`} className="x-axis">
-          <line x1={0} y1={0} x2={innerWidth} y2={0} stroke="black" />
+          <line
+            x1={0}
+            y1={0}
+            x2={innerWidth}
+            y2={0}
+            stroke="black"
+            css={lineStyle}
+          />
           {ticks.map((t) => {
             const offset =
               (xScale(String(t)) as number) + xScale.bandwidth() / 2;
@@ -60,10 +82,18 @@ function Chart({ data }: ChartProps) {
                   textAnchor="middle"
                   alignmentBaseline="hanging"
                   fontSize={8}
+                  css={textStyle}
                 >
                   {t}
                 </text>
-                <line x1={0} y1={0} x2={0} y2={3} stroke="black"></line>
+                <line
+                  x1={0}
+                  y1={0}
+                  x2={0}
+                  y2={3}
+                  stroke="black"
+                  css={lineStyle}
+                ></line>
               </g>
             );
           })}
@@ -74,7 +104,7 @@ function Chart({ data }: ChartProps) {
             y={20}
             textAnchor="middle"
             alignmentBaseline="hanging"
-            fontSize={10}
+            css={textStyle}
           >
             Index
           </text>
@@ -89,12 +119,13 @@ function Chart({ data }: ChartProps) {
             y2={innerHeight}
             stroke="black"
             strokeWidth={1}
+            css={lineStyle}
           />
           {yTicks.map((v) => {
             return (
               <g transform={`translate(0, ${yScale(v)})`} key={v}>
                 <text
-                  fontSize={8}
+                  css={textStyle}
                   textAnchor="end"
                   alignmentBaseline="central"
                   x={-6}
@@ -102,18 +133,19 @@ function Chart({ data }: ChartProps) {
                 >
                   {v}
                 </text>
-                <line x1={0} y1={0} x2={-3} y2={0} stroke="black" />
+                <line x1={0} y1={0} x2={-3} y2={0} css={lineStyle} />
               </g>
             );
           })}
           <g>
             <text
               x={-innerHeight / 2}
-              y={-25}
+              y={-35}
               textAnchor="middle"
               alignmentBaseline="baseline"
               fontSize={10}
               transform={"rotate(-90)"}
+              css={textStyle}
             >
               Value
             </text>

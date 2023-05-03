@@ -2,7 +2,7 @@ import "normalize.css";
 
 import Chart from "./components/Chart";
 import { css } from "@emotion/react";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import * as d3 from "d3";
 function generateNonDuplicateArray(count: number) {
   const array = [];
@@ -22,13 +22,41 @@ function generateNonDuplicateArray(count: number) {
 
 function App() {
   const [data, setData] = useState(() => generateNonDuplicateArray(20));
+  const [algorithm, setAlgorithm] = useState<"selectionSort" | "bubbleSort">(
+    "selectionSort"
+  );
 
   const [isSorting, setIsSorting] = useState(false);
   const [startSorting, setStartSorting] = useState(false);
   const stopSortRef = useRef(false);
 
-  useEffect(() => {
-    if (!startSorting) return;
+  const selectionSort = useCallback(
+    async function selectionSort() {
+      const nums = [...data];
+      for (let i = 0; i < nums.length; i++) {
+        let minIndex = i;
+        for (let j = i + 1; j < nums.length; j++) {
+          if (nums[j] < nums[minIndex]) {
+            minIndex = j;
+          }
+        }
+        [nums[i], nums[minIndex]] = [nums[minIndex], nums[i]];
+        if (stopSortRef.current) break;
+        await sleep(600);
+        setData((prev) => {
+          const next = [...prev];
+          [next[i], next[minIndex]] = [next[minIndex], next[i]];
+          return next;
+        });
+      }
+      setIsSorting(false);
+      setStartSorting(false);
+      stopSortRef.current = false;
+    },
+    [data]
+  );
+
+  const bubbleSort = useCallback(
     async function bubbleSort() {
       const arr = [...data];
       const len = arr.length;
@@ -68,12 +96,33 @@ function App() {
       setIsSorting(false);
       setStartSorting(false);
       stopSortRef.current = false;
-    }
+    },
+    [data]
+  );
+
+  const callbackRef = useRef(selectionSort);
+
+  useEffect(() => {
+    const map = {
+      selectionSort,
+      bubbleSort,
+    };
+    callbackRef.current = map[algorithm];
+  }, [algorithm, bubbleSort, selectionSort]);
+
+  useEffect(() => {
+    if (!startSorting || !callbackRef.current) return;
+    const callback = async function () {
+      await callbackRef.current();
+      setIsSorting(false);
+      setStartSorting(false);
+      stopSortRef.current = false;
+    };
     if (startSorting && !isSorting) {
       setIsSorting(true);
-      bubbleSort();
+      callback();
     }
-  }, [data, isSorting, startSorting]);
+  }, [selectionSort, isSorting, startSorting, bubbleSort]);
 
   async function sleep(delay: number) {
     return new Promise((resolve) => setTimeout(resolve, delay));
@@ -113,15 +162,52 @@ function App() {
       `}
     >
       <h2>Chart</h2>
-      <div>
-        <button onClick={handleSort}>
-          {isSorting ? "stop" : "start"} sort
-        </button>
-        <button onClick={handleShuffle}>suffle</button>
-        <button onClick={handleGenRandom}>random</button>
+      <div
+        css={css`
+          display: flex;
+          justify-content: space-between;
+          margin-bottom: 20px;
+        `}
+      >
+        <div
+          css={css`
+            display: flex;
+            justify-content: space-between;
+          `}
+        >
+          <div
+            css={css`
+              display: flex;
+              justify-content: start;
+              column-gap: 12px;
+            `}
+          >
+            <button onClick={handleGenRandom}>random</button>
+            <button onClick={handleShuffle}>suffle</button>
+
+            <button onClick={handleSort}>
+              {isSorting ? "stop" : "start"} sort
+            </button>
+            <select
+              value={algorithm}
+              onChange={(e) => {
+                if (isSorting) {
+                  stopSortRef.current = true;
+                }
+                setAlgorithm(e.target.value as "selectionSort" | "bubbleSort");
+              }}
+            >
+              <option value="bubbleSort">bubble sort</option>
+              <option value="selectionSort">selection sort</option>
+            </select>
+          </div>
+        </div>
+        <div>
+          <div>isSorting: {isSorting + ""}</div>
+          <div>startSorting: {startSorting + ""}</div>
+        </div>
       </div>
-      <div>isSorting: {isSorting + ""}</div>
-      <div>startSorting: {startSorting + ""}</div>
+
       <Chart data={data} />
     </div>
   );
