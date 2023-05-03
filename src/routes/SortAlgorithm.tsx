@@ -162,20 +162,17 @@ function App() {
   }
 
   return (
-    <div
-      className="sort-viz"
-      css={css`
-        margin-left: auto;
-        margin-right: auto;
-        max-width: 1200px;
-      `}
-    >
+    <div className="sort-viz">
       <Typography variant="h4" gutterBottom>
         排序算法可视化
       </Typography>
 
-      <Stack direction={"row"} justifyContent={"space-between"}>
-        <Box>
+      <Stack
+        direction={"row"}
+        justifyContent={"space-between"}
+        marginBottom={2}
+      >
+        <Box mb={2}>
           <Box mb={2}>
             <Select
               size="small"
@@ -206,12 +203,11 @@ function App() {
             </ButtonGroup>
           </Box>
         </Box>
-
         <Box>
           <Card sx={{ paddingBottom: 0 }}>
             <CardContent>
               <Typography variant="h6" gutterBottom>
-                State{" "}
+                State
               </Typography>
               <Typography>isSorting: {isSorting + ""}</Typography>
               <Typography>startSorting: {startSorting + ""}</Typography>

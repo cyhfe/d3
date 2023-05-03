@@ -10,6 +10,7 @@ import {
 
 import Layout from "./Layout";
 import SortAlgorithm from "./routes/SortAlgorithm";
+import BarChartRace from "./routes/barChartRace";
 
 const router = createBrowserRouter([
   {
@@ -25,8 +26,8 @@ const router = createBrowserRouter([
         element: <SortAlgorithm />,
       },
       {
-        path: "/aa",
-        element: <div>aaa</div>,
+        path: "/bar-chart-race",
+        element: <BarChartRace />,
       },
     ],
   },
