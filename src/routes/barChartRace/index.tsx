@@ -63,20 +63,35 @@ function BarChartRace() {
     //   ...
     // ]
 
-    const datevalues = Array.from(
+    const datevalues: [Date, d3.InternMap<string, number>][] = Array.from(
       d3.rollup(
         dataset,
         ([d]) => d.value,
         (d) => +d.date,
         (d) => d.name
       )
-    )
-      .map(([date, data]) => {
-        return [new Date(date), data];
-      })
-      .sort(([d1], [d2]) => d3.ascending(d1 as Date, d2 as Date));
+    ).map(([date, data]) => {
+      return [new Date(date), data];
+    });
 
-    console.log(datevalues);
+    datevalues.sort(([d1], [d2]) => d3.ascending(d1, d2));
+
+    // datevalues
+    // [
+    //   [date, Map(name => value ...)]
+    //   ...
+    // ]
+
+    function rank(getValueByName: (name: string) => number | undefined) {
+      const data: { name: string; value?: number; rank?: number }[] =
+        Array.from(names, (name) => ({ name, value: getValueByName(name) }));
+      data.sort((a, b) => d3.descending(a.value, b.value));
+      for (let i = 0; i < data.length; i++) {
+        data[i]["rank"] = i;
+      }
+      return data;
+    }
+    console.log(rank((name) => datevalues[0][1].get(name)));
   }, [dataset]);
 
   return (
