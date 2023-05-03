@@ -1,9 +1,18 @@
-import "normalize.css";
-
-import Chart from "./components/Chart";
+import Chart from "../components/Chart";
 import { css } from "@emotion/react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import * as d3 from "d3";
+import {
+  Box,
+  Button,
+  ButtonGroup,
+  Card,
+  CardContent,
+  MenuItem,
+  Select,
+  Stack,
+  Typography,
+} from "@mui/material";
 function generateNonDuplicateArray(count: number) {
   const array = [];
   for (let i = 0; i < 100; i++) {
@@ -161,34 +170,15 @@ function App() {
         max-width: 1200px;
       `}
     >
-      <h2>Chart</h2>
-      <div
-        css={css`
-          display: flex;
-          justify-content: space-between;
-          margin-bottom: 20px;
-        `}
-      >
-        <div
-          css={css`
-            display: flex;
-            justify-content: space-between;
-          `}
-        >
-          <div
-            css={css`
-              display: flex;
-              justify-content: start;
-              column-gap: 12px;
-            `}
-          >
-            <button onClick={handleGenRandom}>random</button>
-            <button onClick={handleShuffle}>suffle</button>
+      <Typography variant="h4" gutterBottom>
+        Sort Algorithm Visuialization
+      </Typography>
 
-            <button onClick={handleSort}>
-              {isSorting ? "stop" : "start"} sort
-            </button>
-            <select
+      <Stack direction={"row"} justifyContent={"space-between"}>
+        <Box>
+          <Box mb={2}>
+            <Select
+              size="small"
               value={algorithm}
               onChange={(e) => {
                 if (isSorting) {
@@ -197,16 +187,32 @@ function App() {
                 setAlgorithm(e.target.value as "selectionSort" | "bubbleSort");
               }}
             >
-              <option value="bubbleSort">bubble sort</option>
-              <option value="selectionSort">selection sort</option>
-            </select>
-          </div>
-        </div>
-        <div>
-          <div>isSorting: {isSorting + ""}</div>
-          <div>startSorting: {startSorting + ""}</div>
-        </div>
-      </div>
+              <MenuItem value={"bubbleSort"}>bubbleSort</MenuItem>
+              <MenuItem value={"selectionSort"}>selectionSort</MenuItem>
+            </Select>
+          </Box>
+
+          <Box mb={2}>
+            <ButtonGroup>
+              <Button onClick={handleGenRandom}>random</Button>
+              <Button onClick={handleShuffle}>suffle</Button>
+
+              <Button onClick={handleSort}>
+                {isSorting ? "stop" : "start"} sort
+              </Button>
+            </ButtonGroup>
+          </Box>
+        </Box>
+
+        <Box>
+          <Card>
+            <CardContent>
+              <Typography>isSorting: {isSorting + ""}</Typography>
+              <Typography>startSorting: {startSorting + ""}</Typography>
+            </CardContent>
+          </Card>
+        </Box>
+      </Stack>
 
       <Chart data={data} />
     </div>
