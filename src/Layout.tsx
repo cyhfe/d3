@@ -12,8 +12,8 @@ const globalStyle = css`
 function Layout() {
   const location = useLocation();
 
-  function getButtonVariant(path: string) {
-    return location.pathname === path ? "contained" : "outlined";
+  function getButtonColor(path: string) {
+    return location.pathname === path ? "success" : "primary";
   }
 
   return (
@@ -24,17 +24,17 @@ function Layout() {
           <Box mb={2}>
             <ButtonGroup aria-label="outlined button group">
               <Link to={"/sort-algorithm"}>
-                <Button variant={getButtonVariant("/sort-algorithm")}>
+                <Button color={getButtonColor("/sort-algorithm")}>
                   Sort Algorithm
                 </Button>
               </Link>
               <Link to={"/bar-chart-race"}>
-                <Button variant={getButtonVariant("/bar-chart-race")}>
+                <Button color={getButtonColor("/bar-chart-race")}>
                   <div>bar chart race</div>
                 </Button>
               </Link>
               <Link to={"/a"}>
-                <Button variant={getButtonVariant("/a")}>
+                <Button color={getButtonColor("/a")}>
                   <div>SortAlgorithm</div>
                 </Button>
               </Link>

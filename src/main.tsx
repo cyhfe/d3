@@ -5,7 +5,7 @@ import Router from "./Router";
 import "normalize.css";
 
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
-  <React.StrictMode>
-    <Router />
-  </React.StrictMode>
+  <Router />
+  // <React.StrictMode>
+  // </React.StrictMode>
 );
