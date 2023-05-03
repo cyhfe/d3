@@ -12,32 +12,30 @@ function Layout() {
   }
 
   return (
-    <Container
-      css={css`
-        margin-top: 20px;
-      `}
-    >
-      <Box mb={2}>
-        <ButtonGroup aria-label="outlined button group">
-          <Link to={"/sort-algorithm"}>
-            <Button variant={getButtonVariant("/sort-algorithm")}>
-              Sort Algorithm
-            </Button>
-          </Link>
-          <Link to={"/car-chart-race"}>
-            <Button variant={getButtonVariant("/car-chart-race")}>
-              <div>bar chart race</div>
-            </Button>
-          </Link>
-          <Link to={"/a"}>
-            <Button variant={getButtonVariant("/a")}>
-              <div>SortAlgorithm</div>
-            </Button>
-          </Link>
-        </ButtonGroup>
-      </Box>
-      <Box mb={2}>
-        <Outlet />
+    <Container>
+      <Box mt={2}>
+        <Box mb={2}>
+          <ButtonGroup aria-label="outlined button group">
+            <Link to={"/sort-algorithm"}>
+              <Button variant={getButtonVariant("/sort-algorithm")}>
+                Sort Algorithm
+              </Button>
+            </Link>
+            <Link to={"/car-chart-race"}>
+              <Button variant={getButtonVariant("/car-chart-race")}>
+                <div>bar chart race</div>
+              </Button>
+            </Link>
+            <Link to={"/a"}>
+              <Button variant={getButtonVariant("/a")}>
+                <div>SortAlgorithm</div>
+              </Button>
+            </Link>
+          </ButtonGroup>
+        </Box>
+        <Box mb={2}>
+          <Outlet />
+        </Box>
       </Box>
     </Container>
   );

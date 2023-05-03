@@ -171,7 +171,7 @@ function App() {
       `}
     >
       <Typography variant="h4" gutterBottom>
-        Sort Algorithm Visuialization
+        排序算法可视化
       </Typography>
 
       <Stack direction={"row"} justifyContent={"space-between"}>
@@ -187,8 +187,8 @@ function App() {
                 setAlgorithm(e.target.value as "selectionSort" | "bubbleSort");
               }}
             >
-              <MenuItem value={"bubbleSort"}>bubbleSort</MenuItem>
-              <MenuItem value={"selectionSort"}>selectionSort</MenuItem>
+              <MenuItem value={"bubbleSort"}>冒泡排序</MenuItem>
+              <MenuItem value={"selectionSort"}>选择排序</MenuItem>
             </Select>
           </Box>
 
@@ -197,7 +197,10 @@ function App() {
               <Button onClick={handleGenRandom}>random</Button>
               <Button onClick={handleShuffle}>suffle</Button>
 
-              <Button onClick={handleSort}>
+              <Button
+                onClick={handleSort}
+                color={!isSorting ? "primary" : "error"}
+              >
                 {isSorting ? "stop" : "start"} sort
               </Button>
             </ButtonGroup>
@@ -205,8 +208,11 @@ function App() {
         </Box>
 
         <Box>
-          <Card>
+          <Card sx={{ paddingBottom: 0 }}>
             <CardContent>
+              <Typography variant="h6" gutterBottom>
+                State{" "}
+              </Typography>
               <Typography>isSorting: {isSorting + ""}</Typography>
               <Typography>startSorting: {startSorting + ""}</Typography>
             </CardContent>
