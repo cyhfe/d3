@@ -5,6 +5,7 @@ import {
   RouterProvider,
   Route,
   Link,
+  Navigate,
 } from "react-router-dom";
 
 import Layout from "./Layout";
@@ -15,6 +16,10 @@ const router = createBrowserRouter([
     path: "/",
     element: <Layout />,
     children: [
+      {
+        path: "/",
+        element: <Navigate to="/sort-algorithm" />,
+      },
       {
         path: "/sort-algorithm",
         element: <SortAlgorithm />,
