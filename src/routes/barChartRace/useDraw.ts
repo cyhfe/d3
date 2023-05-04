@@ -214,8 +214,14 @@ function useDraw(
         ) {
           const dataRanks = ranks.slice(0, n);
 
-          const bars = barsGroup
-            .selectAll("rect")
+          const bars = barsGroup.selectAll("rect") as d3.Selection<
+            d3.BaseType,
+            Rank,
+            SVGGElement,
+            unknown
+          >;
+
+          bars
             .data(dataRanks, (d) => d.name)
             .join(
               (enter) =>
