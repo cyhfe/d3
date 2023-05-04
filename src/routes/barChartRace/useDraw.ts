@@ -181,64 +181,90 @@ function useDraw(
         nameFramesArray.flatMap(([, data]) => d3.pairs(data))
       );
 
-      const innerChart = d3
-        .select(innerChartRef.current)
-        .attr("fill-opacity", 0.6);
+      // const bars:  = d3
+      //   .select(innerChartRef.current)
+      //   .append("g")
+      //   .attr("class", "barGroups")
+      //   .attr("fill-opacity", 0.6) as d3.Selection<
+      //   d3.BaseType,
+      //   Rank,
+      //   SVGGElement,
+      //   unknown
+      // >
 
-      function updateBars(
-        [, ranks]: Keyframe,
-        transition: d3.Transition<d3.BaseType, unknown, null, undefined>
-      ) {
-        const dataRanks = ranks.slice(0, n);
-
-        const bars = innerChart.selectAll("rect") as d3.Selection<
-          d3.BaseType,
-          Rank,
+      function createBarGroup() {
+        let barsGroup = d3
+          .select(innerChartRef.current)
+          .select(".barGroups") as d3.Selection<
           SVGGElement,
-          unknown
+          unknown,
+          null,
+          undefined
         >;
 
-        bars
-          .data(dataRanks, (d) => d.name)
-          .join(
-            (enter) =>
-              enter
-                .append("rect")
-                .attr("fill", "blue")
-                .attr("height", y.bandwidth())
-                .attr("x", x(0))
-                .attr("y", (d) => {
-                  const rank = String((prev.get(d) || d).rank);
-                  return y(rank) || innerHeight + y.bandwidth();
-                })
-                .attr("width", (d) => x((prev.get(d) || d).value) - x(0)),
-            (update) => update,
-            (exit) => {
-              exit
-                .attr("fill", "red")
-                .transition(transition)
-                .remove()
-                .attr("y", (d) => {
-                  return (
-                    y(String((next.get(d) || d).rank)) ||
-                    innerHeight + y.bandwidth()
-                  );
-                })
-                .attr("width", (d) => x((next.get(d) || d).value) - x(0));
+        if (barsGroup.empty()) {
+          barsGroup = d3.select(innerChartRef.current).append("g");
+        }
 
-              return exit;
-            }
-          )
-          .call((bars) => {
-            bars
-              .transition(transition)
-              .attr("fill", "green")
-              .attr("y", (d) => y(String(d.rank)) || innerHeight)
-              .attr("width", (d) => x(d.value) - x(0));
-            return bars;
-          });
-        return bars;
+        barsGroup.attr("class", "barGroups").attr("fill-opacity", 0.6);
+
+        return function updateBars(
+          [, ranks]: Keyframe,
+          transition: d3.Transition<d3.BaseType, unknown, null, undefined>
+        ) {
+          const dataRanks = ranks.slice(0, n);
+
+          const bars = barsGroup
+            .selectAll("rect")
+            .data(dataRanks, (d) => d.name)
+            .join(
+              (enter) =>
+                enter
+                  .append("rect")
+                  .attr("fill", "blue")
+                  .attr("height", y.bandwidth())
+                  .attr("x", x(0))
+                  .attr("y", (d) => {
+                    const rank = String((prev.get(d) || d).rank);
+                    return y(rank) || innerHeight + y.bandwidth();
+                  })
+                  .attr("width", (d) => x((prev.get(d) || d).value) - x(0)),
+              (update) => update,
+              (exit) => {
+                exit
+                  .attr("fill", "red")
+                  .transition(transition)
+                  .remove()
+                  .attr("y", (d) => {
+                    return (
+                      y(String((next.get(d) || d).rank)) ||
+                      innerHeight + y.bandwidth()
+                    );
+                  })
+                  .attr("width", (d) => x((next.get(d) || d).value) - x(0));
+
+                return exit;
+              }
+            )
+            .call((bars) => {
+              console.log(bars);
+              bars
+                .transition(transition)
+                .attr("fill", "green")
+                .attr("y", (d) => y(String(d.rank)) || innerHeight)
+                .attr("width", (d) => x(d.value) - x(0));
+              return bars;
+            });
+          return bars;
+        };
       }
+
+      const updateBars = createBarGroup();
+
+      // function updateAxis(
+      //   [, ranks]: Keyframe,
+      //   transition: d3.Transition<d3.BaseType, unknown, null, undefined>
+      // ) {}
 
       for (const keyframe of keyframes) {
         const transition = d3
@@ -249,6 +275,7 @@ function useDraw(
         // Extract the top bar’s value.
         x.domain([0, keyframe[1][0].value]);
         updateBars(keyframe, transition);
+
         await transition.end();
       }
     },
