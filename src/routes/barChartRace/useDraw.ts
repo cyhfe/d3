@@ -24,6 +24,23 @@ function useDraw(
   innerHeight: number,
   innerWidth: number
 ) {
+  const createGroup = useCallback(
+    function createGroup() {
+      const root = d3
+        .select(innerChartRef.current)
+        .append("g")
+        .attr("class", "root");
+      root.append("g").attr("class", "bars").attr("fill-opacity", 0.6);
+      root.append("g").attr("class", "axis");
+      root.append("g").attr("class", "labels");
+      root.append("g").attr("class", "ticker");
+      return () => {
+        root.remove();
+      };
+    },
+    [innerChartRef]
+  );
+
   const drawBarChart = useCallback(
     async function drawBarChart() {
       if (!dataset || !innerChartRef.current) return;
@@ -192,85 +209,79 @@ function useDraw(
       //   unknown
       // >
 
-      function createBarGroup() {
-        let barsGroup = d3
+      // barsGroup.attr("fill-opacity", 0.6);
+
+      function updateBars(
+        [, ranks]: Keyframe,
+        transition: d3.Transition<d3.BaseType, unknown, null, undefined>
+      ) {
+        const barsGroup = d3
           .select(innerChartRef.current)
-          .select(".barGroups") as d3.Selection<
+          .select(".root .bars") as d3.Selection<
           SVGGElement,
           unknown,
           null,
           undefined
         >;
 
-        if (barsGroup.empty()) {
-          barsGroup = d3.select(innerChartRef.current).append("g");
-        }
+        const dataRanks = ranks.slice(0, n);
 
-        barsGroup.attr("class", "barGroups").attr("fill-opacity", 0.6);
+        const bars = barsGroup.selectAll("rect") as d3.Selection<
+          d3.BaseType,
+          Rank,
+          SVGGElement,
+          unknown
+        >;
 
-        return function updateBars(
-          [, ranks]: Keyframe,
-          transition: d3.Transition<d3.BaseType, unknown, null, undefined>
-        ) {
-          const dataRanks = ranks.slice(0, n);
-
-          const bars = barsGroup.selectAll("rect") as d3.Selection<
-            d3.BaseType,
-            Rank,
-            SVGGElement,
-            unknown
-          >;
-
-          bars
-            .data(dataRanks, (d) => d.name)
-            .join(
-              (enter) =>
-                enter
-                  .append("rect")
-                  .attr("fill", "blue")
-                  .attr("height", y.bandwidth())
-                  .attr("x", x(0))
-                  .attr("y", (d) => {
-                    const rank = String((prev.get(d) || d).rank);
-                    return y(rank) || innerHeight + y.bandwidth();
-                  })
-                  .attr("width", (d) => x((prev.get(d) || d).value) - x(0)),
-              (update) => update,
-              (exit) => {
-                exit
-                  .attr("fill", "red")
-                  .transition(transition)
-                  .remove()
-                  .attr("y", (d) => {
-                    return (
-                      y(String((next.get(d) || d).rank)) ||
-                      innerHeight + y.bandwidth()
-                    );
-                  })
-                  .attr("width", (d) => x((next.get(d) || d).value) - x(0));
-
-                return exit;
-              }
-            )
-            .call((bars) => {
-              console.log(bars);
-              bars
+        bars
+          .data(dataRanks, (d) => d.name)
+          .join(
+            (enter) =>
+              enter
+                .append("rect")
+                .attr("fill", "blue")
+                .attr("height", y.bandwidth())
+                .attr("x", x(0))
+                .attr("y", (d) => {
+                  const rank = String((prev.get(d) || d).rank);
+                  return y(rank) || innerHeight + y.bandwidth();
+                })
+                .attr("width", (d) => x((prev.get(d) || d).value) - x(0)),
+            (update) => update,
+            (exit) => {
+              exit
+                .attr("fill", "red")
                 .transition(transition)
-                .attr("fill", "green")
-                .attr("y", (d) => y(String(d.rank)) || innerHeight)
-                .attr("width", (d) => x(d.value) - x(0));
-              return bars;
-            });
-          return bars;
-        };
+                .remove()
+                .attr("y", (d) => {
+                  return (
+                    y(String((next.get(d) || d).rank)) ||
+                    innerHeight + y.bandwidth()
+                  );
+                })
+                .attr("width", (d) => x((next.get(d) || d).value) - x(0));
+
+              return exit;
+            }
+          )
+          .call((bars) => {
+            console.log(bars);
+            bars
+              .transition(transition)
+              .attr("fill", "green")
+              .attr("y", (d) => y(String(d.rank)) || innerHeight)
+              .attr("width", (d) => x(d.value) - x(0));
+            return bars;
+          });
+        return bars;
       }
 
-      const updateBars = createBarGroup();
-
-      // function updateAxis(
-      //   [, ranks]: Keyframe,
-      //   transition: d3.Transition<d3.BaseType, unknown, null, undefined>
-      // ) {}
+      function updateAxis(
+        [, ranks]: Keyframe,
+        transition: d3.Transition<d3.BaseType, unknown, null, undefined>
+      ) {
+        console.log(ranks);
+      }
 
       for (const keyframe of keyframes) {
         const transition = d3
@@ -287,6 +298,13 @@ function useDraw(
     },
     [dataset, innerChartRef, innerHeight, innerWidth]
   );
+
+  useEffect(() => {
+    const destory = createGroup();
+    return () => {
+      destory();
+    };
+  }, [createGroup]);
 
   useEffect(() => {
     drawBarChart();

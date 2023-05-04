@@ -12,21 +12,10 @@ interface Data {
 
 type Dataset = Data[];
 
-interface Rank {
-  rank: number;
-  name: string;
-  value: number;
-}
-
-type Keyframe = [Date, Rank[]];
-type Keyframes = Keyframe[];
-
 function BarChartRace() {
   const innerChartRef = useRef<SVGGElement | null>(null);
 
   const [dataset, setDataset] = useState<Dataset | null>(null);
-
-  const [, forceUpdate] = useState({});
 
   const viewWidth = 600;
   const viewHeight = 300;
