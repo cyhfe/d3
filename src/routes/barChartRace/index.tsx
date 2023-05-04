@@ -1,4 +1,4 @@
-import { Box, Card, CardContent, Stack, Typography, css } from "@mui/material";
+import { Box, Card, CardContent, Typography, css } from "@mui/material";
 import ChartContainer from "../../components/ChartContainer";
 import * as d3 from "d3";
 import { useEffect, useRef, useState } from "react";
@@ -27,7 +27,7 @@ function BarChartRace() {
   const [dataset, setDataset] = useState<Dataset | null>(null);
 
   const viewWidth = 400;
-  const viewHeight = 200;
+  const viewHeight = 300;
 
   const margin = {
     top: 16,
@@ -56,7 +56,7 @@ function BarChartRace() {
       console.log("draw");
 
       const n = 12; // bars 数量
-      const duration = 1000;
+      const duration = 200;
 
       const x = d3.scaleLinear().domain([0, 1]).range([0, innerWidth]); //value
       const yDomain = Array.from(d3.range(n), (n) => String(n));
@@ -66,7 +66,7 @@ function BarChartRace() {
         .range([0, innerHeight])
         .padding(0.1); //rank
 
-      const innerChart = d3.select(innerChartRef.current);
+      // 处理数据
       const names = new Set(dataset.map((d) => d.name));
 
       // console.log(dataset);
@@ -119,7 +119,7 @@ function BarChartRace() {
       // 我们需要时间对应排名的 date => rank[]
       // 由于排名每年变化一次,20 年才生成 20 个过渡动画,所以我们要对每两年的数据进行线性插值(k代表插值数)
       function getKeyframes(): Keyframes {
-        const k = 1;
+        const k = 10;
         const keyframes: Keyframes = [];
         for (const pairs of d3.pairs(datevalues)) {
           const [[ka, a], [kb, b]] = pairs;
@@ -207,62 +207,64 @@ function BarChartRace() {
         nameFramesArray.flatMap(([, data]) => d3.pairs(data))
       );
 
-      function createBars(
-        container: d3.Selection<SVGGElement, unknown, null, undefined>
+      const innerChart = d3
+        .select(innerChartRef.current)
+        .attr("fill-opacity", 0.6);
+
+      function updateBars(
+        [, ranks]: Keyframe,
+        transition: d3.Transition<d3.BaseType, unknown, null, undefined>
       ) {
-        container.attr("fill-opacity", 0.6).selectAll("rect");
+        const dataRanks = ranks.slice(0, n);
 
-        return (
-          [, ranks]: Keyframe,
-          transition: d3.Transition<d3.BaseType, unknown, null, undefined>
-        ) => {
-          const dataRanks = ranks.slice(0, n);
-          const bars = container.selectAll("rect");
+        const bars = innerChart.selectAll("rect") as d3.Selection<
+          d3.BaseType,
+          Rank,
+          SVGGElement,
+          unknown
+        >;
 
-          bars
-            .data(dataRanks, (d) => d.name)
-            .join(
-              (enter) =>
-                enter
-                  .append("rect")
-                  .attr("fill", "blue")
-                  .attr("height", y.bandwidth())
-                  .attr("x", x(0))
-                  .attr("y", (d) => {
-                    const rank = String((prev.get(d) || d).rank);
-                    return y(rank) || innerHeight;
-                  })
-                  .attr("width", (d) => x((prev.get(d) || d).value) - x(0)),
-              (update) => update,
-              (exit) => {
-                exit
-                  .attr("fill", "red")
-                  .transition(transition)
-                  .remove()
-                  .attr(
-                    "y",
-                    (d) => y(String((next.get(d) || d).rank)) || innerHeight
-                  )
-                  .attr("width", (d) => x((next.get(d) || d).value) - x(0));
-
-                return exit;
-              }
-            )
-            .call((bars) => {
-              // console.log(bars);
-
-              bars
+        bars
+          .data(dataRanks, (d) => d.name)
+          .join(
+            (enter) =>
+              enter
+                .append("rect")
+                .attr("fill", "blue")
+                .attr("height", y.bandwidth())
+                .attr("x", x(0))
+                .attr("y", (d) => {
+                  const rank = String((prev.get(d) || d).rank);
+                  return y(rank) || innerHeight + y.bandwidth();
+                })
+                .attr("width", (d) => x((prev.get(d) || d).value) - x(0)),
+            (update) => update,
+            (exit) => {
+              exit
+                .attr("fill", "red")
                 .transition(transition)
-                .attr("fill", "green")
-                .attr("y", (d) => y(String(d.rank)) || innerHeight)
-                .attr("width", (d) => x(d.value) - x(0));
-              return bars;
-            });
-          return bars;
-        };
-      }
+                .remove()
+                .attr("y", (d) => {
+                  return (
+                    y(String((next.get(d) || d).rank)) ||
+                    innerHeight + y.bandwidth()
+                  );
+                })
+                .attr("width", (d) => x((next.get(d) || d).value) - x(0));
 
-      const updateBars = createBars(innerChart);
+              return exit;
+            }
+          )
+          .call((bars) => {
+            bars
+              .transition(transition)
+              .attr("fill", "green")
+              .attr("y", (d) => y(String(d.rank)) || innerHeight)
+              .attr("width", (d) => x(d.value) - x(0));
+            return bars;
+          });
+        return bars;
+      }
 
       for (const keyframe of keyframes) {
         const transition = d3
@@ -272,7 +274,6 @@ function BarChartRace() {
 
         // Extract the top bar’s value.
         x.domain([0, keyframe[1][0].value]);
-
         updateBars(keyframe, transition);
         await transition.end();
       }
