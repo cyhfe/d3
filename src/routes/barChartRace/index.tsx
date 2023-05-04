@@ -21,7 +21,7 @@ function BarChartRace() {
   const viewHeight = 300;
 
   const margin = {
-    top: 6,
+    top: 26,
     bottom: 6,
     left: 6,
     right: 6,

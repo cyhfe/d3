@@ -34,11 +34,36 @@ function useDraw(
       root.append("g").attr("class", "axis");
       root.append("g").attr("class", "labels");
       root.append("g").attr("class", "ticker");
+      root
+        .append("line")
+        .attr("class", "sider")
+        .attr("x1", 0)
+        .attr("y1", 0)
+        .attr("x2", 0)
+        .attr("y2", innerHeight)
+        .attr("stroke", "#f0f0f0");
+      root
+        .append("text")
+        .attr("class", "year")
+        .style("fill", "#434343")
+        .attr("text-anchor", "end")
+        .attr("x", innerWidth - 6)
+        .attr("y", innerHeight - 6)
+        .attr("dy", "0.32em");
+
+      root
+        .append("g")
+        .attr("class", "year")
+        .style("font", "bold 12px var(--sans-serif)")
+        .style("font-variant-numeric", "tabular-nums")
+        .attr("text-anchor", "end")
+        .selectAll("text");
+
       return () => {
         root.remove();
       };
     },
-    [innerChartRef]
+    [innerChartRef, innerHeight, innerWidth]
   );
 
   const drawBarChart = useCallback(
@@ -57,8 +82,13 @@ function useDraw(
         .range([0, innerHeight])
         .padding(0.1); //rank
 
-      // 处理数据
       const names = new Set(dataset.map((d) => d.name));
+      const catagorys = new Set(dataset.map((d) => d.category));
+
+      const colorScale = d3.scaleOrdinal(d3.schemeTableau10).domain(catagorys);
+
+      const getColorByName = (name: string) =>
+        colorScale(dataset.find((d) => d.name === name)?.category || "");
 
       // console.log(dataset);
 
@@ -109,7 +139,9 @@ function useDraw(
 
       // 我们需要时间对应排名的 date => rank[]
       // 由于排名每年变化一次,20 年才生成 20 个过渡动画,所以我们要对每两年的数据进行线性插值(k代表插值数)
-      function getKeyframes(): Keyframes {
+      function getKeyframes(
+        datevalues: [Date, d3.InternMap<string, number>][]
+      ): Keyframes {
         const k = 10;
         const keyframes: Keyframes = [];
         for (const pairs of d3.pairs(datevalues)) {
@@ -135,7 +167,7 @@ function useDraw(
 
         return keyframes;
       }
-      const keyframes = getKeyframes();
+      const keyframes = getKeyframes(datevalues);
       // console.log(keyframes.slice(0, 10));
 
       // enter => .attr("y", d => y((prev.get(d) || d).rank))
@@ -239,7 +271,6 @@ function useDraw(
             (enter) =>
               enter
                 .append("rect")
-                .attr("fill", "blue")
                 .attr("height", y.bandwidth())
                 .attr("x", x(0))
                 .attr("y", (d) => {
@@ -250,7 +281,6 @@ function useDraw(
             (update) => update,
             (exit) => {
               exit
-                .attr("fill", "red")
                 .transition(transition)
                 .remove()
                 .attr("y", (d) => {
@@ -265,10 +295,9 @@ function useDraw(
             }
           )
           .call((bars) => {
-            console.log(bars);
             bars
+              .attr("fill", (d) => getColorByName(d.name))
               .transition(transition)
-              .attr("fill", "green")
               .attr("y", (d) => y(String(d.rank)) || innerHeight)
               .attr("width", (d) => x(d.value) - x(0));
             return bars;
@@ -277,10 +306,38 @@ function useDraw(
       }
 
       function updateAxis(
-        [, ranks]: Keyframe,
         transition: d3.Transition<d3.BaseType, unknown, null, undefined>
       ) {
-        console.log(ranks);
+        const axis = d3
+          .select(innerChartRef.current)
+          .select(".root .axis") as d3.Selection<
+          SVGGElement,
+          unknown,
+          null,
+          undefined
+        >;
+
+        const axisGenerator = d3
+          .axisTop(x)
+          .ticks(innerWidth / 160)
+          .tickSizeOuter(0)
+          .tickSizeInner(-innerHeight);
+
+        axis.transition(transition).call(axisGenerator);
+        axis.select(".tick:first-of-type text").remove();
+        axis.selectAll(".tick line").attr("stroke", "white");
+        axis.selectAll(".tick text").style("font-size", "6px");
+        axis.select(".domain").remove();
+      }
+
+      function updateYear(
+        [date]: Keyframe,
+        transition: d3.Transition<d3.BaseType, unknown, null, undefined>
+      ) {
+        d3.select(innerChartRef.current)
+          .select(".root .year")
+          .transition(transition)
+          .text(d3.timeFormat("%Y %b")(date));
       }
 
       for (const keyframe of keyframes) {
@@ -292,7 +349,8 @@ function useDraw(
         // Extract the top bar’s value.
         x.domain([0, keyframe[1][0].value]);
         updateBars(keyframe, transition);
-
+        updateAxis(transition);
+        updateYear(keyframe, transition);
         await transition.end();
       }
     },
