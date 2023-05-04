@@ -2,7 +2,7 @@ import { Outlet, Link } from "react-router-dom";
 import { css, Global } from "@emotion/react";
 import { ButtonGroup, Button, Box, Container } from "@mui/material";
 import { useLocation } from "react-router-dom";
-
+import NiceTry from "../src/routes/niceTry/index";
 const globalStyle = css`
   body {
     background-color: #eceff1;
@@ -33,10 +33,8 @@ function Layout() {
                   <div>bar chart race</div>
                 </Button>
               </Link>
-              <Link to={"/a"}>
-                <Button color={getButtonColor("/a")}>
-                  <div>SortAlgorithm</div>
-                </Button>
+              <Link to={"/nice-try"}>
+                <Button color={getButtonColor("/nice-try")}>SortAl</Button>
               </Link>
             </ButtonGroup>
           </Box>

@@ -21,6 +21,7 @@ function BarShape({ data, innerHeight, xScale, yScale }: BarShapeProps) {
       const mergeTransition = enterTransition.transition().duration(200);
 
       const rects = d3.select(barGroup.current).selectAll("rect");
+      console.log(rects);
 
       rects
         .data(data, (d) => d as number)

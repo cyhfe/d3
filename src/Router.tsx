@@ -7,6 +7,7 @@ import {
   Link,
   Navigate,
 } from "react-router-dom";
+import NiceTry from "./routes/niceTry";
 
 import Layout from "./Layout";
 import SortAlgorithm from "./routes/SortAlgorithm";
@@ -28,6 +29,10 @@ const router = createBrowserRouter([
       {
         path: "/bar-chart-race",
         element: <BarChartRace />,
+      },
+      {
+        path: "/nice-try",
+        element: <NiceTry />,
       },
     ],
   },

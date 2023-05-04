@@ -53,16 +53,17 @@ function BarChartRace() {
   useEffect(() => {
     async function drawBarChart() {
       if (!dataset || !innerChartRef.current) return;
+      console.log("draw");
 
       const n = 12; // bars 数量
-      const duration = 250;
+      const duration = 1000;
 
       const x = d3.scaleLinear().domain([0, 1]).range([0, innerWidth]); //value
       const yDomain = Array.from(d3.range(n), (n) => String(n));
       const y = d3
         .scaleBand()
         .domain(yDomain)
-        .range([innerHeight, 0])
+        .range([0, innerHeight])
         .padding(0.1); //rank
 
       const innerChart = d3.select(innerChartRef.current);
@@ -118,7 +119,7 @@ function BarChartRace() {
       // 我们需要时间对应排名的 date => rank[]
       // 由于排名每年变化一次,20 年才生成 20 个过渡动画,所以我们要对每两年的数据进行线性插值(k代表插值数)
       function getKeyframes(): Keyframes {
-        const k = 10;
+        const k = 1;
         const keyframes: Keyframes = [];
         for (const pairs of d3.pairs(datevalues)) {
           const [[ka, a], [kb, b]] = pairs;
@@ -144,7 +145,7 @@ function BarChartRace() {
         return keyframes;
       }
       const keyframes = getKeyframes();
-      console.log(keyframes.slice(0, 10));
+      // console.log(keyframes.slice(0, 10));
 
       // enter => .attr("y", d => y((prev.get(d) || d).rank))
       //          .attr("width", d => x((prev.get(d) || d).value) - x(0)),
@@ -209,16 +210,17 @@ function BarChartRace() {
       function createBars(
         container: d3.Selection<SVGGElement, unknown, null, undefined>
       ) {
-        const bars: d3.Selection<d3.BaseType, Rank, SVGGElement, unknown> =
-          container.append("g").attr("fill-opacity", 0.6).selectAll("rect");
+        container.attr("fill-opacity", 0.6).selectAll("rect");
 
         return (
-          keyframes: Keyframe,
+          [, ranks]: Keyframe,
           transition: d3.Transition<d3.BaseType, unknown, null, undefined>
         ) => {
-          const [, rank] = keyframes;
-          return bars
-            .data(rank.slice(0, n), (d) => d.name)
+          const dataRanks = ranks.slice(0, n);
+          const bars = container.selectAll("rect");
+
+          bars
+            .data(dataRanks, (d) => d.name)
             .join(
               (enter) =>
                 enter
@@ -228,31 +230,42 @@ function BarChartRace() {
                   .attr("x", x(0))
                   .attr("y", (d) => {
                     const rank = String((prev.get(d) || d).rank);
-                    return y(rank) ?? "";
+                    return y(rank) || innerHeight;
                   })
                   .attr("width", (d) => x((prev.get(d) || d).value) - x(0)),
               (update) => update,
-              (exit) =>
-                exit.call((exit) =>
-                  exit
-                    .transition(transition)
-                    .remove()
-                    .attr("y", (d) => y(String((next.get(d) || d).rank)) ?? "")
-                    .attr("width", (d) => x((next.get(d) || d).value) - x(0))
-                )
+              (exit) => {
+                exit
+                  .attr("fill", "red")
+                  .transition(transition)
+                  .remove()
+                  .attr(
+                    "y",
+                    (d) => y(String((next.get(d) || d).rank)) || innerHeight
+                  )
+                  .attr("width", (d) => x((next.get(d) || d).value) - x(0));
+
+                return exit;
+              }
             )
-            .call((bars) =>
+            .call((bars) => {
+              // console.log(bars);
+
               bars
                 .transition(transition)
-                .attr("y", (d) => y(String(d.rank)) ?? "")
-                .attr("width", (d) => x(d.value) - x(0))
-            );
+                .attr("fill", "green")
+                .attr("y", (d) => y(String(d.rank)) || innerHeight)
+                .attr("width", (d) => x(d.value) - x(0));
+              return bars;
+            });
+          return bars;
         };
       }
 
       const updateBars = createBars(innerChart);
+
       for (const keyframe of keyframes) {
-        const transition = innerChart
+        const transition = d3
           .transition()
           .duration(duration)
           .ease(d3.easeLinear);
@@ -264,6 +277,7 @@ function BarChartRace() {
         await transition.end();
       }
     }
+    drawBarChart();
   }, [dataset, innerHeight, innerWidth]);
 
   return (
@@ -288,14 +302,7 @@ function BarChartRace() {
                 outline: 1px solid red;
               `}
             >
-              <g className="inner-chart" ref={innerChartRef}>
-                <rect
-                  width={innerWidth}
-                  height={innerHeight}
-                  stroke="black"
-                  fill="none"
-                />
-              </g>
+              <g className="inner-chart" ref={innerChartRef}></g>
             </ChartContainer>
           </CardContent>
         </Card>
