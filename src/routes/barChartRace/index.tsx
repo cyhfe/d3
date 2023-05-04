@@ -12,6 +12,12 @@ interface Data {
 
 type Dataset = Data[];
 
+interface Rank {
+  rank: number;
+  name: string;
+  value: number;
+}
+
 function BarChartRace() {
   const innerChartRef = useRef<SVGGElement | null>(null);
 
@@ -81,11 +87,7 @@ function BarChartRace() {
     //   ...
     // ]
 
-    function rank(getValueByName: (name: string) => number): {
-      rank: number;
-      name: string;
-      value: number;
-    }[] {
+    function rank(getValueByName: (name: string) => number): Rank[] {
       const data = Array.from(names, (name) => ({
         name,
         value: getValueByName(name),
@@ -95,6 +97,7 @@ function BarChartRace() {
       return dataWithRank;
     }
 
+    // 我们需要时间对应排名的 date => rank[]
     // 由于排名每年变化一次,20 年才生成 20 个过渡动画,所以我们要对每两年的数据进行线性插值(k代表插值数)
     function getKeyframes(): [Date, ReturnType<typeof rank>][] {
       const k = 10;
@@ -123,7 +126,64 @@ function BarChartRace() {
       return keyframes;
     }
     const keyframes = getKeyframes();
-    const nameFrames = keyframes.map(([, data]) => data).flat();
+    console.log(keyframes.slice(0, 10));
+
+    // enter => .attr("y", d => y((prev.get(d) || d).rank))
+    //          .attr("width", d => x((prev.get(d) || d).value) - x(0)),
+
+    // exit => exit.transition(transition).remove()
+    // .attr("y", d => y((next.get(d) || d).rank))
+    // .attr("width", d => x((next.get(d) || d).value) - x(0))
+
+    // 过渡效果:
+    // 进入时,移动到前一个时间点的位置
+    // 退出时,移动到下一个时间点的位置
+    // 进入和更新合并更新当前位置
+    const flatKeyframesWithoutDate = keyframes.map(([, data]) => data).flat();
+
+    // 得到 name => rank[](按时间排序)
+    const nameFrames = d3.group(flatKeyframesWithoutDate, (v) => v.name);
+
+    //   [string, {
+    //     rank: number;
+    //     name: string;
+    //     value: number;
+    //   }[]][]
+
+    const nameFramesArray = Array.from(nameFrames);
+
+    // [
+    //   [
+    //     // 按名字排序
+    //     [
+    //       // 按时间排序
+    //       Rank1,
+    //       Rank2
+    //     ],
+    //   ],
+    //   ...
+    // ]
+    const mapNameFramesArray = nameFramesArray.map(([, data]) => {
+      // [
+      //   // 按名字排序
+      //   [
+      //     // 按时间排序
+      //     Rank1,
+      //     Rank2
+      //   ],
+      // ]
+      const pairs = d3.pairs(data, (a, b) => [b, a]) as [Rank, Rank][];
+      return pairs;
+    });
+
+    // [
+    //   [ Rank1,Rank2,]
+    //   [ Rank1,Rank2,]
+    //   [ Rank1,Rank2,]
+    // ]
+    const flatMapNameFramesArray = mapNameFramesArray.flat();
+
+    const prev = new Map(flatMapNameFramesArray);
   }, [dataset]);
 
   return (
