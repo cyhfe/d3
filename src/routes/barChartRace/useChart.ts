@@ -18,14 +18,16 @@ interface Rank {
 type Keyframe = [Date, Rank[]];
 type Keyframes = Keyframe[];
 
-function useDraw(
+function useChart(
   dataset: Dataset | null,
   innerChartRef: React.MutableRefObject<SVGGElement | null>,
   innerHeight: number,
   innerWidth: number
 ) {
-  const createGroup = useCallback(
-    function createGroup() {
+  const createChart = useCallback(
+    function createChart() {
+      if (!innerChartRef.current) return () => void 0;
+      console.log("create");
       const root = d3
         .select(innerChartRef.current)
         .append("g")
@@ -59,17 +61,20 @@ function useDraw(
         .attr("text-anchor", "end")
         .selectAll("text");
 
+      root.append("g").attr("class", "info").append("text").append("tspan");
+
       return () => {
+        console.log("remove");
         root.remove();
       };
     },
     [innerChartRef, innerHeight, innerWidth]
   );
 
-  const drawBarChart = useCallback(
-    async function drawBarChart() {
-      if (!dataset || !innerChartRef.current) return;
-      console.log("draw");
+  const updateChart = useCallback(
+    async function updateChart() {
+      if (!innerChartRef.current || !dataset) return;
+      console.log("update");
 
       const n = 12; // bars 数量
       const duration = 200;
@@ -340,6 +345,81 @@ function useDraw(
           .text(d3.timeFormat("%Y %b")(date));
       }
 
+      // function updateInfo(
+      //   [date, ranks]: Keyframe,
+      //   transition: d3.Transition<d3.BaseType, unknown, null, undefined>
+      // ) {
+      //   const dataRanks = ranks.slice(0, n);
+
+      //   const infoGroups = d3
+      //     .select(innerChartRef.current)
+      //     .select(".root")
+      //     .selectAll(".info") as d3.Selection<
+      //     d3.BaseType,
+      //     unknown,
+      //     SVGGElement,
+      //     unknown
+      //   >;
+
+      //   const infos = infoGroups.selectAll("g") as d3.Selection<
+      //     d3.BaseType,
+      //     Rank,
+      //     SVGGElement,
+      //     unknown
+      //   >;
+
+      //   infos
+      //     .data(dataRanks, (d) => d.name)
+      //     .join(
+      //       (enter) =>
+      //         enter
+      //           .append("g")
+      //           .attr("paading", 2)
+      //           .call((enter) => {
+      //             enter
+      //               .append("text")
+      //               .attr("alignment-baseline", "mathematical")
+      //               .attr("text-anchor", "end")
+      //               .style("font-size", 8)
+      //               .text((d) => d.value)
+      //               .append("tspan")
+      //               .style("font-size", 12)
+      //               .attr("alignment-baseline", "central")
+      //               .attr("text-anchor", "end")
+      //               .text((d) => d.name);
+      //           }),
+      //       (update) => update,
+      //       (exit) => exit.remove()
+      //     )
+      //     .call((infos) =>
+      //       infos
+      //         .append("g")
+      //         .attr("paading", 2)
+      //         .call((enter) => {
+      //           enter
+      //             .append("text")
+      //             .attr("alignment-baseline", "mathematical")
+      //             .attr("text-anchor", "end")
+      //             .style("font-size", 8)
+      //             .text((d) => d.value)
+      //             .append("tspan")
+      //             .style("font-size", 12)
+      //             .attr("alignment-baseline", "central")
+      //             .attr("text-anchor", "end")
+      //             .text((d) => d.name);
+      //         })
+
+      //         .transition(transition)
+      //         .attr(
+      //           "transform",
+      //           (d) =>
+      //             `translate(${x(d.value) - 4}, ${
+      //               (y(String(d.rank)) || innerHeight) + y.bandwidth() / 2
+      //             })`
+      //         )
+      //     );
+      // }
+
       for (const keyframe of keyframes) {
         const transition = d3
           .transition()
@@ -351,6 +431,7 @@ function useDraw(
         updateBars(keyframe, transition);
         updateAxis(transition);
         updateYear(keyframe, transition);
+        // updateInfo(keyframe, transition);
         await transition.end();
       }
     },
@@ -358,17 +439,16 @@ function useDraw(
   );
 
   useEffect(() => {
-    const destory = createGroup();
+    const destory = createChart();
     return () => {
       destory();
     };
-  }, [createGroup]);
+  }, [createChart]);
 
-  useEffect(() => {
-    drawBarChart();
-  }, [drawBarChart]);
-
-  return drawBarChart;
+  return {
+    createChart,
+    updateChart,
+  };
 }
 
-export default useDraw;
+export default useChart;

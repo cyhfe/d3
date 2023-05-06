@@ -2,7 +2,7 @@ import { Box, Button, Card, CardContent, Typography, css } from "@mui/material";
 import ChartContainer from "../../components/ChartContainer";
 import * as d3 from "d3";
 import { useEffect, useRef, useState } from "react";
-import useDraw from "./useDraw";
+import useChart from "./useChart";
 interface Data {
   date: Date;
   name: string;
@@ -30,11 +30,20 @@ function BarChartRace() {
   const innerHeight = viewHeight - margin.top - margin.bottom;
   const innerWidth = viewWidth - margin.left - margin.right;
 
-  const drawBarChart = useDraw(dataset, innerChartRef, innerHeight, innerWidth);
+  const { updateChart } = useChart(
+    dataset,
+    innerChartRef,
+    innerHeight,
+    innerWidth
+  );
 
   function handleReplay() {
-    drawBarChart();
+    updateChart();
   }
+
+  useEffect(() => {
+    updateChart();
+  }, [dataset, updateChart]);
 
   useEffect(() => {
     async function getDataset() {
