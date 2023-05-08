@@ -1,50 +1,102 @@
-import { Outlet, Link } from "react-router-dom";
-import { css, Global } from "@emotion/react";
-import { ButtonGroup, Button, Box, Container } from "@mui/material";
-import { useLocation } from "react-router-dom";
-import NiceTry from "../src/routes/niceTry/index";
-const globalStyle = css`
-  body {
-    background-color: #eceff1;
-  }
-`;
+import AppBar from "@mui/material/AppBar";
+import Box from "@mui/material/Box";
+import CssBaseline from "@mui/material/CssBaseline";
 
-function Layout() {
+import Drawer from "@mui/material/Drawer";
+
+import ListItemText from "@mui/material/ListItemText";
+
+import { Link, Outlet, useLocation } from "react-router-dom";
+import * as colors from "@mui/material/colors";
+import { MenuItem, MenuList } from "@mui/material";
+
+const drawerWidth = 240;
+const menuItemList = [
+  {
+    to: "/sort-algorithm",
+    label: "排序算法可视化",
+  },
+  {
+    to: "/bar-chart-race",
+    label: "趋势图动态排序",
+  },
+];
+
+export default function ResponsiveDrawer() {
   const location = useLocation();
 
-  function getButtonColor(path: string) {
-    return location.pathname === path ? "success" : "primary";
+  function isSelected(to: string) {
+    return location.pathname === to;
   }
 
+  function renderMenuItem() {
+    return menuItemList.map((m) => {
+      return (
+        <MenuItem
+          key={m.to}
+          component={Link}
+          to={m.to}
+          selected={isSelected(m.to)}
+          sx={{
+            "&.Mui-selected": {
+              color: colors.blue[600],
+            },
+          }}
+        >
+          <ListItemText>{m.label}</ListItemText>
+        </MenuItem>
+      );
+    });
+  }
+
+  const drawer = (
+    <div>
+      <MenuList>{renderMenuItem()}</MenuList>
+    </div>
+  );
+
   return (
-    <>
-      <Global styles={globalStyle} />
-      <Container>
-        <Box mt={2} className="as">
-          <Box mb={2}>
-            <ButtonGroup aria-label="outlined button group">
-              <Link to={"/sort-algorithm"}>
-                <Button color={getButtonColor("/sort-algorithm")}>
-                  Sort Algorithm
-                </Button>
-              </Link>
-              <Link to={"/bar-chart-race"}>
-                <Button color={getButtonColor("/bar-chart-race")}>
-                  <div>bar chart race</div>
-                </Button>
-              </Link>
-              <Link to={"/nice-try"}>
-                <Button color={getButtonColor("/nice-try")}>SortAl</Button>
-              </Link>
-            </ButtonGroup>
-          </Box>
-          <Box mb={2}>
-            <Outlet />
-          </Box>
-        </Box>
-      </Container>
-    </>
+    <Box sx={{ display: "flex" }}>
+      <CssBaseline />
+      <AppBar
+        position="fixed"
+        sx={{
+          width: { sm: `calc(100% - ${drawerWidth}px)` },
+          ml: { sm: `${drawerWidth}px` },
+        }}
+      ></AppBar>
+      <Box
+        component="nav"
+        sx={{ width: { sm: drawerWidth }, flexShrink: { sm: 0 } }}
+        aria-label="mailbox folders"
+      >
+        {/* The implementation can be swapped with js to avoid SEO duplication of links. */}
+
+        <Drawer
+          variant="permanent"
+          sx={{
+            display: { xs: "none", sm: "block" },
+            "& .MuiDrawer-paper": {
+              boxSizing: "border-box",
+              width: drawerWidth,
+            },
+          }}
+          open
+        >
+          {drawer}
+        </Drawer>
+      </Box>
+      <Box
+        component="main"
+        sx={{
+          flexGrow: 1,
+          p: 3,
+          width: { sm: `calc(100% - ${drawerWidth}px)` },
+          background: colors.blueGrey[50],
+        }}
+      >
+        <Outlet />
+      </Box>
+    </Box>
   );
 }
-
-export default Layout;
