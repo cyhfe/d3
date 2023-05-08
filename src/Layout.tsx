@@ -13,8 +13,8 @@ import { MenuItem, MenuList } from "@mui/material";
 const drawerWidth = 240;
 const menuItemList = [
   {
-    to: "/state-of-js",
-    label: "D3与React集成",
+    to: "/midi-viz",
+    label: "MIDI音符可视化",
   },
   {
     to: "/sort-algorithm",

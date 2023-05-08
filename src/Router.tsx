@@ -7,7 +7,7 @@ import {
 import Layout from "./Layout";
 import SortAlgorithm from "./routes/SortAlgorithm";
 import BarChartRace from "./routes/barChartRace";
-import StateOfJs from "./routes/stateOfJs";
+import { MidiViz } from "./routes/MidiViz/index";
 
 const router = createBrowserRouter([
   {
@@ -19,8 +19,8 @@ const router = createBrowserRouter([
         element: <Navigate to="/sort-algorithm" />,
       },
       {
-        path: "/state-of-js",
-        element: <StateOfJs />,
+        path: "/midi-viz",
+        element: <MidiViz />,
       },
       {
         path: "/sort-algorithm",

@@ -14,11 +14,14 @@
     "@emotion/styled": "^11.10.8",
     "@mui/icons-material": "^5.11.16",
     "@mui/material": "^5.12.3",
+    "@tonejs/midi": "^2.0.28",
     "d3": "^7.8.4",
     "normalize.css": "^8.0.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-router-dom": "^6.11.0"
+    "react-router-dom": "^6.11.0",
+    "tone": "^14.7.77",
+    "uuid": "^9.0.0"
   },
   "devDependencies": {
     "@types/d3": "^7.4.0",
