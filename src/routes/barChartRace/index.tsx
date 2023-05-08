@@ -59,11 +59,11 @@ function BarChartRace() {
   return (
     <Box className="bar-chart-race">
       <Typography variant="h4" gutterBottom>
-        BarChart Race
+        趋势图动态排序
       </Typography>
       <Box>
         <Button variant="outlined" onClick={() => handleReplay()}>
-          replay
+          重新播放
         </Button>
       </Box>
       <Box mt={2}>

@@ -189,30 +189,19 @@ function App() {
             </Select>
           </Box>
 
-          <Box mb={2}>
+          <Box>
             <ButtonGroup>
-              <Button onClick={handleGenRandom}>random</Button>
-              <Button onClick={handleShuffle}>suffle</Button>
+              <Button onClick={handleGenRandom}>生成随机数</Button>
+              <Button onClick={handleShuffle}>洗牌</Button>
 
               <Button
                 onClick={handleSort}
                 color={!isSorting ? "primary" : "error"}
               >
-                {isSorting ? "stop" : "start"} sort
+                {isSorting ? "停止排序" : "开始排序"}
               </Button>
             </ButtonGroup>
           </Box>
-        </Box>
-        <Box>
-          <Card sx={{ paddingBottom: 0 }}>
-            <CardContent>
-              <Typography variant="h6" gutterBottom>
-                State
-              </Typography>
-              <Typography>isSorting: {isSorting + ""}</Typography>
-              <Typography>startSorting: {startSorting + ""}</Typography>
-            </CardContent>
-          </Card>
         </Box>
       </Stack>
 
