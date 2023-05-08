@@ -1,8 +1,8 @@
 import { css } from "@emotion/react";
 import { useScale } from "./useScale";
 function Keyboard() {
-  const { keys, xScale } = useScale();
-  console.log(keys);
+  // const { keys, xScale } = useScale();
+  // console.log(keys);
 
   return (
     <svg
