@@ -16,7 +16,7 @@ const router = createBrowserRouter([
     children: [
       {
         path: "/",
-        element: <Navigate to="/sort-algorithm" />,
+        element: <Navigate to="/midi-viz" />,
       },
       {
         path: "/midi-viz",
