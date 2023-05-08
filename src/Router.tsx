@@ -1,17 +1,13 @@
-import React from "react";
-import { createRoot } from "react-dom/client";
 import {
   createBrowserRouter,
   RouterProvider,
-  Route,
-  Link,
   Navigate,
 } from "react-router-dom";
-import NiceTry from "./routes/niceTry";
 
 import Layout from "./Layout";
 import SortAlgorithm from "./routes/SortAlgorithm";
 import BarChartRace from "./routes/barChartRace";
+import StateOfJs from "./routes/stateOfJs";
 
 const router = createBrowserRouter([
   {
@@ -23,16 +19,16 @@ const router = createBrowserRouter([
         element: <Navigate to="/sort-algorithm" />,
       },
       {
+        path: "/state-of-js",
+        element: <StateOfJs />,
+      },
+      {
         path: "/sort-algorithm",
         element: <SortAlgorithm />,
       },
       {
         path: "/bar-chart-race",
         element: <BarChartRace />,
-      },
-      {
-        path: "/nice-try",
-        element: <NiceTry />,
       },
     ],
   },

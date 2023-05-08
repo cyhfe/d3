@@ -13,6 +13,10 @@ import { MenuItem, MenuList } from "@mui/material";
 const drawerWidth = 240;
 const menuItemList = [
   {
+    to: "/state-of-js",
+    label: "D3与React集成",
+  },
+  {
     to: "/sort-algorithm",
     label: "排序算法可视化",
   },
@@ -93,6 +97,7 @@ export default function ResponsiveDrawer() {
           p: 3,
           width: { sm: `calc(100% - ${drawerWidth}px)` },
           background: colors.blueGrey[50],
+          minHeight: "100vh",
         }}
       >
         <Outlet />

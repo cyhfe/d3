@@ -1,13 +1,11 @@
 import Chart from "../components/Chart";
-import { css } from "@emotion/react";
+
 import { useCallback, useEffect, useRef, useState } from "react";
 import * as d3 from "d3";
 import {
   Box,
   Button,
   ButtonGroup,
-  Card,
-  CardContent,
   MenuItem,
   Select,
   Stack,
