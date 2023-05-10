@@ -36,6 +36,10 @@ const menuItemList = [
     to: "/area-chart",
     label: "areaChart",
   },
+  {
+    to: "/state-of-js",
+    label: "state-of-js",
+  },
 ];
 
 export default function ResponsiveDrawer() {

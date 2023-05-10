@@ -1,0 +1,90 @@
+import { useEffect, useRef } from "react";
+import * as d3 from "d3";
+import ChartContainer from "../../components/ChartContainer";
+
+import type { Data, DataList } from "./types";
+
+const width = 640;
+const height = 400;
+const margin = {
+  top: 20,
+  right: 20,
+  bottom: 30,
+  left: 40,
+};
+
+const innerWidth = width - margin.left - margin.right;
+const innerHeight = height - margin.top - margin.bottom;
+
+interface AreaChartProps {
+  data: DataList;
+}
+
+function AreaChart({ data }: AreaChartProps) {
+  const groupRef = useRef<SVGGElement>(null);
+  // useEffect(() => {
+  //   function updateChart(data?: DataList) {
+  //     if (!data || !groupRef.current) return;
+
+  //     const xDomain = d3.extent(data, (d) => d.date);
+  //     const yDomain = [0, d3.max(data, (d) => d.close)];
+
+  //     const xScale = d3.scaleTime(xDomain, [0, innerWidth]);
+  //     const yScale = d3.scaleLinear(yDomain, [innerHeight, 0]);
+
+  //     const xAxisGenerator = d3.axisBottom(xScale).tickSizeOuter(0);
+  //     const yAxisGenerator = d3.axisLeft(yScale);
+  //     const rootGroup = d3.select(groupRef.current);
+  //     const chartGroup = rootGroup.append("g");
+
+  //     // chartGroup
+  //     //   .append("path")
+  //     //   .attr("d", areaGenerator(data))
+  //     //   .attr("fill", "steelblue");
+
+  //     // chartGroup
+  //     //   .append("g")
+  //     //   .call(xAxisGenerator)
+  //     //   .attr("transform", `translate(0, ${innerHeight})`);
+
+  //     // chartGroup
+  //     //   .append("g")
+  //     //   .call(yAxisGenerator)
+  //     //   .call((g) => g.select(".domain").remove())
+  //     //   .call((g) =>
+  //     //     g
+  //     //       .selectAll(".tick line")
+  //     //       .clone()
+  //     //       .attr("x2", innerWidth)
+  //     //       .attr("stroke-opacity", 0.1)
+  //     //   )
+  //     //   .call((g) =>
+  //     //     g
+  //     //       .append("text")
+  //     //       .attr("x", -margin.left + 4)
+  //     //       .attr("y", -margin.top + 4)
+  //     //       .attr("alignment-baseline", "hanging")
+  //     //       .attr("fill", "black")
+  //     //       .attr("text-anchor", "start")
+  //     //       .text("↑ Daily close ($)")
+  //     //   );
+
+  //     return () => {
+  //       chartGroup.remove();
+  //     };
+  //   }
+  //   const remove = updateChart(data);
+
+  //   return () => {
+  //     remove?.();
+  //   };
+  // }, [data]);
+
+  return (
+    <ChartContainer width={width} height={height} margin={margin}>
+      <g ref={groupRef}></g>
+    </ChartContainer>
+  );
+}
+
+export default AreaChart;

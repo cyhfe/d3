@@ -1,8 +1,4 @@
-import {
-  createBrowserRouter,
-  RouterProvider,
-  Navigate,
-} from "react-router-dom";
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
 
 import Layout from "./Layout";
 import SortAlgorithm from "./routes/SortAlgorithm";
@@ -10,6 +6,7 @@ import BarChartRace from "./routes/barChartRace";
 import { MidiViz } from "./routes/MidiViz/index";
 import BarChart from "./routes/barChart";
 import AreaChart from "./routes/areaChart";
+import StateOfJs from "./routes/stateOfJs";
 
 import Home from "./routes/Home.mdx";
 
@@ -41,6 +38,10 @@ const router = createBrowserRouter([
       {
         path: "/area-chart",
         element: <AreaChart />,
+      },
+      {
+        path: "/state-of-js",
+        element: <StateOfJs />,
       },
     ],
   },
