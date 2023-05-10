@@ -84,7 +84,7 @@ function ChartRoot() {
           </Box>
           <Card>
             <CardContent>
-              <Chart data={filterData(data, filter)} />
+              <Chart data={data} filter={filter} />
             </CardContent>
           </Card>
           <Post />
