@@ -4,12 +4,12 @@ import ChartContainer from "../../components/ChartContainer";
 
 import type { Data, FilteredData, Rank } from "./types";
 
-const width = 640;
-const height = 400;
+const width = 650;
+const height = 500;
 const margin = {
-  top: 20,
-  right: 20,
-  bottom: 30,
+  top: 40,
+  right: 40,
+  bottom: 40,
   left: 40,
 };
 
@@ -23,12 +23,6 @@ interface ChartProps {
 
 function Chart({ data, filter }: ChartProps) {
   const groupRef = useRef<SVGGElement>(null);
-
-  // useEffect(() => {
-  //   const r = data;
-  //   debugger;
-  // }, [data]);
-
   useEffect(() => {
     function update(data: Data, filter: string) {
       if (!groupRef.current) return;
@@ -76,19 +70,36 @@ function Chart({ data, filter }: ChartProps) {
 
       const valueGroup = chartGroup
         .append("g")
-        .selectAll("text")
+        .selectAll("g")
         .data(data.items)
         .join("g")
         .append("g")
-        .selectAll("text")
+        .attr("transform", `translate(0, ${innerHeight})`)
+        .selectAll("g")
         .data<Rank>((d) => d[filter].filter((d: Rank) => d.rank !== null))
-        .join("text")
+        .join("g")
+        .attr(
+          "transform",
+          (d: Rank) =>
+            `translate(${Number(xScale(String(d.year)))}, ${
+              Number(yScale(String(d.rank))) - innerHeight
+            })`
+        );
+
+      valueGroup
+        .append("circle")
+        .attr("cx", 0)
+        .attr("cy", 0)
+        .attr("r", 15)
+        .attr("fill", "white")
+        .attr("stroke", "black");
+
+      valueGroup
+        .append("text")
         .text((d) => {
           return Math.round(d.percentageQuestion);
         })
-        .attr("transform", `translate(0, ${innerHeight})`)
-        .attr("x", (d) => Number(xScale(String(d.year))))
-        .attr("y", (d) => Number(yScale(String(d.rank))) - innerHeight)
+        .attr("fill", "blue")
         .attr("text-anchor", "middle")
         .attr("alignment-baseline", "central");
 
