@@ -6,7 +6,7 @@ import NotesViz from "./NotesViz";
 import { NoteJSON } from "@tonejs/midi/dist/Note";
 import * as d3 from "d3";
 import { useScale } from "./useScale";
-
+import Post from "./post.mdx";
 function MidiViz() {
   const [midiData, setMidiData] = useState<Midi | null>(null);
   const [notes, setNotes] = useState<NoteJSON[]>([]);
@@ -102,11 +102,8 @@ function MidiViz() {
   }, [schedule]);
 
   return (
-    <div
-      css={css`
-        height: 100vh;
-      `}
-    >
+    <div>
+      <Post />
       <div
         css={css`
           height: 10%;
@@ -124,13 +121,6 @@ function MidiViz() {
         >
           pause
         </button>
-        <div>
-          `@tone/midi`
-          读取midi文件.`Tone.transport.schedule`调度每个note延迟4s(动画过渡时间)播放
-          Tone.PolySynth`播放音符.d3绘制 svg 动画. //todo: tone transport
-          schadule与预想的不一样,无法停止已经调度的音符(停止播放).时间改变重新调度(进度条).
-          钢琴键盘实现
-        </div>
       </div>
 
       <NotesViz

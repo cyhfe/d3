@@ -18,10 +18,15 @@ const NotesViz = forwardRef<SVGRectElement, NotesVizProps>(function NotesViz(
       <svg
         css={css`
           display: block;
+          width: 100%;
+          padding-left: 5vw;
+          padding-right: 5vw;
+          margin-left: auto;
+          margin-right: auto;
+          margin-top: 2rem;
+          height: 60vh;
         `}
         viewBox="0 ,0, 400, 300"
-        width={"100%"}
-        height={"80%"}
         preserveAspectRatio="none"
       >
         <rect x={0} y={0} width={400} height={300} fill="#263238">
