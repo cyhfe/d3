@@ -1,8 +1,8 @@
 ```tsx
-import React, { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import * as d3 from "d3";
 import ChartContainer from "../../components/ChartContainer";
-import { Card, CardContent, css } from "@mui/material";
+
 import type { Data, DataList } from "./types";
 
 const width = 640;
@@ -17,46 +17,45 @@ const margin = {
 const innerWidth = width - margin.left - margin.right;
 const innerHeight = height - margin.top - margin.bottom;
 
-interface BarChartProps {
+interface AreaChartProps {
   data: DataList;
 }
 
-function BarChart({ data }: BarChartProps) {
+function AreaChart({ data }: AreaChartProps) {
   const groupRef = useRef<SVGGElement>(null);
   useEffect(() => {
     function updateChart(data?: DataList) {
       if (!data || !groupRef.current) return;
-      const sortedData = d3.sort(data, (a, b) =>
-        d3.descending(a.frequency, b.frequency)
-      );
 
-      const xDomain = sortedData.map((d) => d.letter);
-      const yDomain = [0, d3.max(data, (d) => d.frequency)];
+      const xDomain = d3.extent(data, (d) => d.date);
+      const yDomain = [0, d3.max(data, (d) => d.close)];
 
-      const xScale = d3.scaleBand(xDomain, [0, innerWidth]).padding(0.1);
+      const xScale = d3.scaleTime(xDomain, [0, innerWidth]);
       const yScale = d3.scaleLinear(yDomain, [innerHeight, 0]);
 
       const xAxisGenerator = d3.axisBottom(xScale).tickSizeOuter(0);
-      const yAxisGenerator = d3.axisLeft(yScale).ticks(innerHeight / 40, "%");
+      const yAxisGenerator = d3.axisLeft(yScale);
       const rootGroup = d3.select(groupRef.current);
-      const barsGroup = rootGroup.append("g");
+      const chartGroup = rootGroup.append("g");
 
-      barsGroup
-        .selectAll<SVGSVGElement, Data>("rect")
-        .data(sortedData, (d) => d.letter)
-        .join("rect")
-        .attr("x", (d) => xScale(d.letter))
-        .attr("y", (d) => yScale(d.frequency))
-        .attr("width", () => xScale.bandwidth())
-        .attr("height", (d) => innerHeight - yScale(d.frequency))
+      const areaGenerator = d3
+        .area<Data>()
+        .curve(d3.curveLinear)
+        .x((d) => xScale(d.date))
+        .y1((d) => yScale(d.close))
+        .y0(yScale(0));
+
+      chartGroup
+        .append("path")
+        .attr("d", areaGenerator(data))
         .attr("fill", "steelblue");
 
-      rootGroup
+      chartGroup
         .append("g")
         .call(xAxisGenerator)
         .attr("transform", `translate(0, ${innerHeight})`);
 
-      rootGroup
+      chartGroup
         .append("g")
         .call(yAxisGenerator)
         .call((g) => g.select(".domain").remove())
@@ -75,17 +74,17 @@ function BarChart({ data }: BarChartProps) {
             .attr("alignment-baseline", "hanging")
             .attr("fill", "black")
             .attr("text-anchor", "start")
-            .text("↑ Frequency")
+            .text("↑ Daily close ($)")
         );
 
       return () => {
-        barsGroup.remove();
+        chartGroup.remove();
       };
     }
     const remove = updateChart(data);
 
     return () => {
-      remove();
+      remove?.();
     };
   }, [data]);
 
@@ -96,5 +95,5 @@ function BarChart({ data }: BarChartProps) {
   );
 }
 
-export default BarChart;
+export default AreaChart;
 ```
