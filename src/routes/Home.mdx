@@ -8,9 +8,133 @@
 
 UI 很简陋,有空再优化.写代码为主.
 
-在 React 中写 `MDX`真方便!
+React 中写 MDX 太方便了!
 
-```ts
-// todo: 代码块渲染
-const a = 1;
+## D3 图表的一般流程
+
+React 与 D3 集成有两种方式.
+
+- React 渲染, 比如`data.map(d => <rect />)`.
+
+这种方式只将 d3 作为工具库使用.不能使用 transition,axis 等
+
+- D3 渲染,把 DOM 通过 ref 暴露给 D3,在 useEffect 中用 D3 渲染.
+
+我更倾向后者,比较方便.
+
+1. 确定 SVG 的几何信息和偏移量
+
+基本每个图表都会用到,封装了个 `ChartContainer`通用组件
+
+```tsx
+import { css } from "@emotion/react";
+
+interface Margin {
+  top: number;
+  left: number;
+  bottom: number;
+  right: number;
+}
+
+interface ChartContainerProps extends React.ComponentPropsWithoutRef<"svg"> {
+  children?: React.ReactNode;
+  width?: number;
+  height?: number;
+  viewWidth?: number;
+  viewHeight?: number;
+  margin?: Margin;
+}
+
+function ChartContainer({
+  children,
+  width,
+  height,
+  viewWidth,
+  viewHeight,
+  margin = {
+    top: 0,
+    bottom: 0,
+    left: 0,
+    right: 0,
+  },
+  ...rest
+}: ChartContainerProps) {
+  return (
+    <svg
+      width={width}
+      height={height}
+      viewBox={`0, 0, ${viewWidth ?? width}, ${viewHeight ?? height}`}
+      {...rest}
+    >
+      <g transform={`translate(${margin.left}, ${margin.top})`}>{children}</g>
+    </svg>
+  );
+}
+
+export default ChartContainer;
+```
+
+2. 确定比例尺
+
+SVG 的坐标轴是右下为正.
+rect 的 width.height 不能为负.
+所以看情况变通
+
+```tsx
+const xScale = d3.scaleBand(xDomain, [0, innerWidth]).padding(0.1);
+const yScale = d3.scaleLinear(yDomain, [innerHeight, 0]);
+```
+
+3. 绘制形状
+
+就是绘制 SVG,这里可能会用到 Data-binding, join,transition 等等,
+是图表中最核心的部分
+
+```tsx
+barsGroup
+  .selectAll<SVGSVGElement, Data>("rect")
+  .data(sortedData, (d) => d.letter)
+  .join("rect")
+  .attr("x", (d) => xScale(d.letter))
+  .attr("y", (d) => yScale(d.frequency))
+  .attr("width", () => xScale.bandwidth())
+  .attr("height", (d) => innerHeight - yScale(d.frequency))
+  .attr("fill", "steelblue");
+```
+
+4. 绘制坐标轴
+
+通过比例尺渲染坐标轴,可以 d3 内建功能修改 UI.
+如果还不能满足需求,那只能自己画坐标轴了,方式同上绘制形状.
+
+```tsx
+const xAxisGenerator = d3.axisBottom(xScale).tickSizeOuter(0);
+const yAxisGenerator = d3.axisLeft(yScale).ticks(innerHeight / 40, "%");
+
+rootGroup
+  .append("g")
+  .call(xAxisGenerator)
+  .attr("transform", `translate(0, ${innerHeight})`);
+
+rootGroup
+  .append("g")
+  .call(yAxisGenerator)
+  .call((g) => g.select(".domain").remove())
+  .call((g) =>
+    g
+      .selectAll(".tick line")
+      .clone()
+      .attr("x2", innerWidth)
+      .attr("stroke-opacity", 0.1)
+  )
+  .call((g) =>
+    g
+      .append("text")
+      .attr("x", -margin.left + 4)
+      .attr("y", -margin.top + 4)
+      .attr("alignment-baseline", "hanging")
+      .attr("fill", "black")
+      .attr("text-anchor", "start")
+      .text("↑ Frequency")
+  );
 ```

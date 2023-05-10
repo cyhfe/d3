@@ -28,6 +28,10 @@ const menuItemList = [
     to: "/bar-chart-race",
     label: "趋势图动态排序",
   },
+  {
+    to: "/bar-chart",
+    label: "barChart",
+  },
 ];
 
 export default function ResponsiveDrawer() {

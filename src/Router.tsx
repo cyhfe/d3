@@ -8,6 +8,7 @@ import Layout from "./Layout";
 import SortAlgorithm from "./routes/SortAlgorithm";
 import BarChartRace from "./routes/barChartRace";
 import { MidiViz } from "./routes/MidiViz/index";
+import BarChart from "./routes/barChart";
 
 import Home from "./routes/Home.mdx";
 
@@ -31,6 +32,10 @@ const router = createBrowserRouter([
       {
         path: "/bar-chart-race",
         element: <BarChartRace />,
+      },
+      {
+        path: "/bar-chart",
+        element: <BarChart />,
       },
     ],
   },

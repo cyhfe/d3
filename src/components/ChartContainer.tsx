@@ -20,8 +20,8 @@ function ChartContainer({
   children,
   width,
   height,
-  viewWidth = 350,
-  viewHeight = 100,
+  viewWidth,
+  viewHeight,
   margin = {
     top: 0,
     bottom: 0,
@@ -34,7 +34,7 @@ function ChartContainer({
     <svg
       width={width}
       height={height}
-      viewBox={`0, 0, ${viewWidth}, ${viewHeight}`}
+      viewBox={`0, 0, ${viewWidth ?? width}, ${viewHeight ?? height}`}
       {...rest}
     >
       <g transform={`translate(${margin.left}, ${margin.top})`}>{children}</g>

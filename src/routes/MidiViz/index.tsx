@@ -134,8 +134,8 @@ function MidiViz() {
         viewBox="0 0 600 300"
         css={css`
           display: block;
-          width: 100%;
-          height: 10%;
+          /* width: 100%;
+          height: 10%; */
         `}
       ></svg>
     </div>

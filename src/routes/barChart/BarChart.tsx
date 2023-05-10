@@ -1,0 +1,98 @@
+import React, { useEffect, useRef, useState } from "react";
+import * as d3 from "d3";
+import ChartContainer from "../../components/ChartContainer";
+import { Card, CardContent, css } from "@mui/material";
+import type { Data, DataList } from "./types";
+
+const width = 640;
+const height = 400;
+const margin = {
+  top: 20,
+  right: 20,
+  bottom: 30,
+  left: 40,
+};
+
+const innerWidth = width - margin.left - margin.right;
+const innerHeight = height - margin.top - margin.bottom;
+
+interface BarChartProps {
+  data: DataList;
+}
+
+function BarChart({ data }: BarChartProps) {
+  const groupRef = useRef<SVGGElement>(null);
+  useEffect(() => {
+    function updateChart(data?: DataList) {
+      if (!data || !groupRef.current) return;
+      const sortedData = d3.sort(data, (a, b) =>
+        d3.descending(a.frequency, b.frequency)
+      );
+
+      const xDomain = sortedData.map((d) => d.letter);
+      const yDomain = [0, d3.max(data, (d) => d.frequency)];
+
+      const xScale = d3.scaleBand(xDomain, [0, innerWidth]).padding(0.1);
+      const yScale = d3.scaleLinear(yDomain, [innerHeight, 0]);
+
+      const xAxisGenerator = d3.axisBottom(xScale).tickSizeOuter(0);
+      const yAxisGenerator = d3.axisLeft(yScale).ticks(innerHeight / 40, "%");
+      const rootGroup = d3.select(groupRef.current);
+      const barsGroup = rootGroup.append("g");
+
+      barsGroup
+        .selectAll<SVGSVGElement, Data>("rect")
+        .data(sortedData, (d) => d.letter)
+        .join("rect")
+        .attr("x", (d) => xScale(d.letter))
+        .attr("y", (d) => yScale(d.frequency))
+        .attr("width", () => xScale.bandwidth())
+        .attr("height", (d) => innerHeight - yScale(d.frequency))
+        .attr("fill", "steelblue");
+
+      rootGroup
+        .append("g")
+        .call(xAxisGenerator)
+        .attr("transform", `translate(0, ${innerHeight})`);
+
+      rootGroup
+        .append("g")
+        .call(yAxisGenerator)
+        .call((g) => g.select(".domain").remove())
+        .call((g) =>
+          g
+            .selectAll(".tick line")
+            .clone()
+            .attr("x2", innerWidth)
+            .attr("stroke-opacity", 0.1)
+        )
+        .call((g) =>
+          g
+            .append("text")
+            .attr("x", -margin.left + 4)
+            .attr("y", -margin.top + 4)
+            .attr("alignment-baseline", "hanging")
+            .attr("fill", "black")
+            .attr("text-anchor", "start")
+            .text("↑ Frequency")
+        );
+
+      return () => {
+        barsGroup.remove();
+      };
+    }
+    const remove = updateChart(data);
+
+    return () => {
+      remove();
+    };
+  }, [data]);
+
+  return (
+    <ChartContainer width={width} height={height} margin={margin}>
+      <g ref={groupRef}></g>
+    </ChartContainer>
+  );
+}
+
+export default BarChart;
