@@ -1,17 +1,17 @@
 import React, { useEffect, useState } from "react";
 import * as d3 from "d3";
 import { Card, CardContent, Typography } from "@mui/material";
-import BarChart from "./BarChart";
+import AreaChart from "./AreaChart";
 
 import type { DataList } from "./types";
 import Post from "./post.mdx";
-function BarChartRoot() {
+function AreaChartRoot() {
   const [data, setData] = useState<DataList | null>(null);
 
   useEffect(() => {
     async function getData() {
       const data = (await d3.csv(
-        "/data/alphabet.csv",
+        "/data/aapl.csv",
         d3.autoType
       )) as unknown as DataList;
 
@@ -23,13 +23,13 @@ function BarChartRoot() {
   return (
     <>
       <Typography variant="h4" gutterBottom>
-        字母频率
+        Apple股票每日收盘价
       </Typography>
       {data && (
         <>
           <Card>
             <CardContent>
-              <BarChart data={data} />
+              <AreaChart data={data} />
             </CardContent>
           </Card>
           <Post />
@@ -39,4 +39,4 @@ function BarChartRoot() {
   );
 }
 
-export default BarChartRoot;
+export default AreaChartRoot;

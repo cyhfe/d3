@@ -1,7 +1,8 @@
-import React, { useEffect, useRef } from "react";
+```tsx
+import React, { useEffect, useRef, useState } from "react";
 import * as d3 from "d3";
 import ChartContainer from "../../components/ChartContainer";
-
+import { Card, CardContent, css } from "@mui/material";
 import type { Data, DataList } from "./types";
 
 const width = 640;
@@ -96,3 +97,4 @@ function BarChart({ data }: BarChartProps) {
 }
 
 export default BarChart;
+```
