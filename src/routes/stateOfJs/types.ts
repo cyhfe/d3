@@ -1665,7 +1665,7 @@
 //   ],
 // };
 
-interface Rank {
+export interface Rank {
   year: number;
   rank: number | null;
   percentageQuestion: number | null;
@@ -1684,4 +1684,7 @@ export interface Data {
   items: Item[];
 }
 
-export type DataList = Data[];
+export interface FilteredData {
+  id: string;
+  data: Rank[];
+}

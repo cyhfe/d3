@@ -2,7 +2,7 @@ import { useEffect, useRef } from "react";
 import * as d3 from "d3";
 import ChartContainer from "../../components/ChartContainer";
 
-import type { Data, DataList } from "./types";
+import type { Data, FilteredData } from "./types";
 
 const width = 640;
 const height = 400;
@@ -16,12 +16,17 @@ const margin = {
 const innerWidth = width - margin.left - margin.right;
 const innerHeight = height - margin.top - margin.bottom;
 
-interface AreaChartProps {
-  data: DataList;
+interface ChartProps {
+  data: FilteredData[];
 }
 
-function AreaChart({ data }: AreaChartProps) {
+function Chart({ data }: ChartProps) {
   const groupRef = useRef<SVGGElement>(null);
+
+  useEffect(() => {
+    console.log(data);
+  }, [data]);
+
   // useEffect(() => {
   //   function updateChart(data?: DataList) {
   //     if (!data || !groupRef.current) return;
@@ -87,4 +92,4 @@ function AreaChart({ data }: AreaChartProps) {
   );
 }
 
-export default AreaChart;
+export default Chart;
