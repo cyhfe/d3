@@ -79,9 +79,6 @@ function BarChartRace() {
               viewWidth={viewWidth}
               viewHeight={viewHeight}
               margin={margin}
-              css={css`
-                outline: 1px solid red;
-              `}
             >
               <g className="inner-chart" ref={innerChartRef}></g>
             </ChartContainer>
