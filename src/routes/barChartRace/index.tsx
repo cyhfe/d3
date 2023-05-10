@@ -3,6 +3,7 @@ import ChartContainer from "../../components/ChartContainer";
 import * as d3 from "d3";
 import { useEffect, useRef, useState } from "react";
 import useChart from "./useChart";
+import README from "./README.mdx";
 interface Data {
   date: Date;
   name: string;
@@ -61,6 +62,9 @@ function BarChartRace() {
       <Typography variant="h4" gutterBottom>
         趋势图动态排序
       </Typography>
+      <Box>
+        <README />
+      </Box>
       <Box>
         <Button variant="outlined" onClick={() => handleReplay()}>
           重新播放
