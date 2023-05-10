@@ -9,6 +9,8 @@ import SortAlgorithm from "./routes/SortAlgorithm";
 import BarChartRace from "./routes/barChartRace";
 import { MidiViz } from "./routes/MidiViz/index";
 
+import Home from "./routes/Home.mdx";
+
 const router = createBrowserRouter([
   {
     path: "/",
@@ -16,7 +18,7 @@ const router = createBrowserRouter([
     children: [
       {
         path: "/",
-        element: <Navigate to="/midi-viz" />,
+        element: <Home />,
       },
       {
         path: "/midi-viz",

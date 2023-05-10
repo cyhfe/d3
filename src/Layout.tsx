@@ -13,6 +13,10 @@ import { MenuItem, MenuList } from "@mui/material";
 const drawerWidth = 240;
 const menuItemList = [
   {
+    to: "/",
+    label: "README",
+  },
+  {
     to: "/midi-viz",
     label: "MIDI音符可视化",
   },
