@@ -1671,7 +1671,7 @@ export interface Rank {
   percentageQuestion: number | null;
 }
 
-interface Item {
+export interface Item {
   id: string;
   usage: Rank[];
   awareness: Rank[];

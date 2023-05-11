@@ -2,7 +2,7 @@ import { useEffect, useRef } from "react";
 import * as d3 from "d3";
 import ChartContainer from "../../components/ChartContainer";
 
-import type { Data, FilteredData, Rank } from "./types";
+import type { Data, Rank, Item } from "./types";
 
 const width = 650;
 const height = 400;
@@ -41,8 +41,6 @@ function Chart({ data, filter }: ChartProps) {
 
       const xAxisGenerator = d3.axisBottom(xScale);
 
-      const yAxisGenerator = d3.axisLeft(yScale);
-
       const pathGenerator = d3
         .line<Rank>()
         .x((d) => {
@@ -52,33 +50,39 @@ function Chart({ data, filter }: ChartProps) {
         .defined((d) => d.rank !== null)
         .curve(d3.curveMonotoneX);
 
-      const rootGroup = d3.select(groupRef.current);
+      const rootGroup = d3.select(groupRef.current).attr("class", "rootGroup");
 
       const chartGroup = rootGroup.append("g").attr("class", "chartGroup");
 
+      const transition = d3.transition().duration(300).ease(d3.easeCubicOut);
+
       const pathGroup = chartGroup
         .append("g")
+        .attr("class", "pathGroup")
         .attr("transform", `translate(0, ${innerHeight})`);
 
       pathGroup
-        .selectAll("path")
-        .data(data.items)
+        .selectAll<SVGPathElement, Item>("path")
+        .data<Item>(data.items, (d) => d.id)
         .join("path")
-        .attr("d", (d) => pathGenerator(d[filter]))
         .attr("stroke", (d) => String(colorScale(d.id)))
         .attr("stroke-width", 3)
-        .attr("fill", "none");
+        .attr("fill", "none")
+        .transition(transition)
+        .attr("d", (d) => pathGenerator(d[filter]));
 
-      const xAxis = chartGroup.append("g");
+      const xAxis = chartGroup.append("g").attr("class", "xAxis");
       xAxis.attr("transform", `translate(0, ${innerHeight})`);
       xAxis.call(xAxisGenerator).select(".domain").remove();
       xAxis.selectAll(".tick line").remove();
 
-      const valueGroup = chartGroup
-        .append("g")
-        .selectAll("g")
-        .data(data.items)
+      const itemGroup = chartGroup.append("g").attr("class", "itemGroup");
+
+      const textGroup = itemGroup
+        .selectAll<SVGGElement, Item>("g")
+        .data<Item>(data.items, (d) => d.id)
         .join("g")
+        .attr("class", "item")
         .append("g")
         .attr("transform", `translate(0, ${innerHeight})`)
         .selectAll("g")
@@ -96,16 +100,18 @@ function Chart({ data, filter }: ChartProps) {
             })`
         );
 
-      valueGroup
+      textGroup
         .append("circle")
         .attr("cx", 0)
         .attr("cy", 0)
         .attr("r", 8)
         .attr("fill", "white")
-        .attr("stroke", (d) => String(colorScale(d.id)))
+        .attr("stroke", (d) => {
+          return String(colorScale(d.id));
+        })
         .attr("stroke-width", 2);
 
-      valueGroup
+      textGroup
         .append("text")
         .text((d) => {
           return Math.round(d.percentageQuestion);
@@ -115,6 +121,58 @@ function Chart({ data, filter }: ChartProps) {
         .attr("alignment-baseline", "central")
         .attr("font-size", 6)
         .attr("font-weight", "bold");
+
+      const offsetItemsLeft = itemGroup
+        .selectAll(".item")
+        .filter((d) => {
+          return d[filter][0].rank !== null;
+        })
+        .append("g")
+        .attr("font-weight", "bold")
+        .attr("font-size", "10")
+        .attr("transform", (d) => {
+          const offsetY = yScale(String(d[filter][0].rank));
+          return `translate(-18, ${offsetY})`;
+        })
+        .attr("class", "offsetItem") as d3.Selection<
+        SVGGElement,
+        Rank & { id: string },
+        null,
+        undefined
+      >;
+
+      offsetItemsLeft
+        .append("text")
+        .text((d) => d.id)
+        .attr("fill", (d) => String(colorScale(d.id)))
+        .attr("text-anchor", "end")
+        .attr("alignment-baseline", "central");
+
+      const offsetItemsRight = itemGroup
+        .selectAll(".item")
+        .filter((d) => {
+          return d[filter][d[filter].length - 1].rank !== null;
+        })
+        .append("g")
+        .attr("font-weight", "bold")
+        .attr("font-size", "10")
+        .attr("transform", (d) => {
+          const offsetY = yScale(String(d[filter][d[filter].length - 1].rank));
+          return `translate(${innerWidth + 18}, ${offsetY})`;
+        })
+        .attr("class", "offsetItem") as d3.Selection<
+        SVGGElement,
+        Rank & { id: string },
+        null,
+        undefined
+      >;
+
+      offsetItemsRight
+        .append("text")
+        .text((d) => d.id)
+        .attr("fill", (d) => String(colorScale(d.id)))
+        .attr("text-anchor", "start")
+        .attr("alignment-baseline", "central");
 
       return () => {
         chartGroup.remove();
