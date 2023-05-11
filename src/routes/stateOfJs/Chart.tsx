@@ -4,13 +4,13 @@ import ChartContainer from "../../components/ChartContainer";
 
 import type { Data, Rank, Item } from "./types";
 
-const width = 650;
+const width = 600;
 const height = 400;
 const margin = {
-  top: 30,
-  right: 120,
+  top: 60,
+  right: 60,
   bottom: 30,
-  left: 120,
+  left: 60,
 };
 
 const innerWidth = width - margin.left - margin.right;
@@ -39,7 +39,7 @@ function Chart({ data, filter }: ChartProps) {
         .domain(ids)
         .range(d3.schemeTableau10);
 
-      const xAxisGenerator = d3.axisBottom(xScale);
+      const xAxisGenerator = d3.axisTop(xScale);
 
       const pathGenerator = d3
         .line<Rank>()
@@ -71,10 +71,13 @@ function Chart({ data, filter }: ChartProps) {
         .attr("d", (d) => pathGenerator(d[filter]));
 
       const xAxis = chartGroup.select<SVGGElement>(".xAxis");
-      xAxis.attr("transform", `translate(0, ${innerHeight})`);
+      xAxis.attr("transform", `translate(0, -16)`);
       xAxis.call(xAxisGenerator).select(".domain").remove();
       xAxis.selectAll(".tick line").remove();
-
+      xAxis
+        .selectAll(".tick text")
+        .attr("fill", "#90a4ae")
+        .attr("font-size", 10);
       const itemGroup = chartGroup.select(".itemGroup");
 
       const items = itemGroup
@@ -170,10 +173,6 @@ function Chart({ data, filter }: ChartProps) {
         .attr("fill", (d) => String(colorScale(d.id)))
         .attr("text-anchor", "start")
         .attr("alignment-baseline", "central");
-
-      return () => {
-        chartGroup.remove();
-      };
     }
     update(data, filter);
   }, [data, filter]);
@@ -183,7 +182,7 @@ function Chart({ data, filter }: ChartProps) {
       viewHeight={height}
       margin={margin}
       style={{
-        maxWidth: "1200px",
+        maxWidth: "960px",
       }}
     >
       <g ref={groupRef} className="rootGroup">

@@ -38,7 +38,10 @@ function ChartRoot() {
       {data && (
         <>
           <Box mb={2}>
-            <ButtonGroup size="small">
+            <ButtonGroup
+              size="small"
+              sx={{ display: "flex", justifyContent: "center" }}
+            >
               <Button
                 color={getFilterColor("usage")}
                 onClick={() => setFilter("usage")}
@@ -66,7 +69,7 @@ function ChartRoot() {
             </ButtonGroup>
           </Box>
           <Card>
-            <CardContent>
+            <CardContent sx={{ display: "flex", justifyContent: "center" }}>
               <Chart data={data} filter={filter} />
             </CardContent>
           </Card>
