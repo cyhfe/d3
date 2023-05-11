@@ -10,20 +10,9 @@ import {
 } from "@mui/material";
 import Chart from "./Chart";
 
-import type { Data, FilteredData } from "./types";
+import type { Data } from "./types";
 
 import Post from "./post.mdx";
-
-function filterData(data: Data, filter: string) {
-  const output: FilteredData[] = [];
-  data.items.forEach((item) => {
-    output.push({
-      id: item.id,
-      data: item[filter],
-    });
-  });
-  return output;
-}
 
 function ChartRoot() {
   const [data, setData] = useState<Data | null>(null);
@@ -40,12 +29,6 @@ function ChartRoot() {
     }
     getData();
   }, []);
-
-  // useEffect(() => {
-  //   if (!data) return;
-  //   const r = filterData(data, filter);
-  //   debugger;
-  // }, [data, filter]);
 
   return (
     <>

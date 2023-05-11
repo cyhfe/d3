@@ -132,24 +132,15 @@ function Chart({ data, filter }: ChartProps) {
         .attr("font-weight", "bold")
         .attr("font-size", "10")
         .call((itemGroup) => {
-          itemGroup
-            // .attr("transform", (d) => {
-            //   // const offsetY = yScale(String(d[filter][0].rank));
-            //   return `translate(-18, 0)`;
-            // })
-            .attr("class", "offsetItem")
-            .transition()
-            .duration(300)
-            .attr("transform", (d) => {
-              const offsetY = yScale(String(d[filter][0].rank));
-              return `translate(-18, ${offsetY})`;
-            });
+          itemGroup.attr("class", "offsetItem").attr("transform", (d) => {
+            const offsetY = yScale(String(d[filter][0].rank));
+            return `translate(-18, ${offsetY})`;
+          });
         }) as d3.Selection<SVGGElement, Rank & { id: string }, null, undefined>;
 
       offsetItemsLeft
         .append("text")
         .text((d) => d.id)
-        // .transition(transition)
         .attr("fill", (d) => String(colorScale(d.id)))
         .attr("text-anchor", "end")
         .attr("alignment-baseline", "central");
@@ -184,11 +175,7 @@ function Chart({ data, filter }: ChartProps) {
         chartGroup.remove();
       };
     }
-
-    const remove = update(data, filter);
-    return () => {
-      // remove?.();
-    };
+    update(data, filter);
   }, [data, filter]);
   return (
     <ChartContainer
