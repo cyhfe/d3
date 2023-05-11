@@ -77,13 +77,15 @@ function Chart({ data, filter }: ChartProps) {
 
       const itemGroup = chartGroup.select(".itemGroup");
 
-      const textGroup = itemGroup
+      const items = itemGroup
         .selectAll<SVGGElement, Item>("g")
         .data<Item>(data.items, (d) => d.id)
         .join("g")
         .attr("class", "item")
-        .append("g")
-        .attr("transform", `translate(0, ${innerHeight})`)
+        .append("g");
+
+      const textGroup = items
+
         .selectAll("g")
         .data<Rank & { id: string }>((d) => {
           return d[filter]
@@ -94,9 +96,9 @@ function Chart({ data, filter }: ChartProps) {
         .attr(
           "transform",
           (d: Rank) =>
-            `translate(${Number(xScale(String(d.year)))}, ${
-              Number(yScale(String(d.rank))) - innerHeight
-            })`
+            `translate(${Number(xScale(String(d.year)))}, ${Number(
+              yScale(String(d.rank))
+            )})`
         );
 
       textGroup
