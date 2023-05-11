@@ -5,12 +5,12 @@ import ChartContainer from "../../components/ChartContainer";
 import type { Data, FilteredData, Rank } from "./types";
 
 const width = 650;
-const height = 500;
+const height = 400;
 const margin = {
-  top: 40,
-  right: 40,
-  bottom: 40,
-  left: 40,
+  top: 30,
+  right: 120,
+  bottom: 30,
+  left: 120,
 };
 
 const innerWidth = width - margin.left - margin.right;
@@ -33,6 +33,11 @@ function Chart({ data, filter }: ChartProps) {
       const xScale = d3.scalePoint().domain(xDomain).range([0, innerWidth]);
 
       const yScale = d3.scalePoint().domain(yDomain).range([0, innerHeight]);
+      const ids = data.items.map((i) => i.id);
+      const colorScale = d3
+        .scaleOrdinal()
+        .domain(ids)
+        .range(d3.schemeTableau10);
 
       const xAxisGenerator = d3.axisBottom(xScale);
 
@@ -60,8 +65,9 @@ function Chart({ data, filter }: ChartProps) {
         .data(data.items)
         .join("path")
         .attr("d", (d) => pathGenerator(d[filter]))
-        .attr("fill", "none")
-        .attr("stroke", "blue");
+        .attr("stroke", (d) => String(colorScale(d.id)))
+        .attr("stroke-width", 3)
+        .attr("fill", "none");
 
       const xAxis = chartGroup.append("g");
       xAxis.attr("transform", `translate(0, ${innerHeight})`);
@@ -76,7 +82,11 @@ function Chart({ data, filter }: ChartProps) {
         .append("g")
         .attr("transform", `translate(0, ${innerHeight})`)
         .selectAll("g")
-        .data<Rank>((d) => d[filter].filter((d: Rank) => d.rank !== null))
+        .data<Rank & { id: string }>((d) => {
+          return d[filter]
+            .filter((d: Rank) => d.rank !== null)
+            .map((n: Rank) => ({ ...n, id: d.id }));
+        })
         .join("g")
         .attr(
           "transform",
@@ -90,18 +100,21 @@ function Chart({ data, filter }: ChartProps) {
         .append("circle")
         .attr("cx", 0)
         .attr("cy", 0)
-        .attr("r", 15)
+        .attr("r", 8)
         .attr("fill", "white")
-        .attr("stroke", "black");
+        .attr("stroke", (d) => String(colorScale(d.id)))
+        .attr("stroke-width", 2);
 
       valueGroup
         .append("text")
         .text((d) => {
           return Math.round(d.percentageQuestion);
         })
-        .attr("fill", "blue")
+        .attr("fill", "black")
         .attr("text-anchor", "middle")
-        .attr("alignment-baseline", "central");
+        .attr("alignment-baseline", "central")
+        .attr("font-size", 6)
+        .attr("font-weight", "bold");
 
       return () => {
         chartGroup.remove();
@@ -114,7 +127,14 @@ function Chart({ data, filter }: ChartProps) {
     };
   }, [data, filter]);
   return (
-    <ChartContainer viewWidth={width} viewHeight={height} margin={margin}>
+    <ChartContainer
+      viewWidth={width}
+      viewHeight={height}
+      margin={margin}
+      style={{
+        maxWidth: "1200px",
+      }}
+    >
       <g ref={groupRef}></g>
     </ChartContainer>
   );
