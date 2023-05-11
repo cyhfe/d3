@@ -40,6 +40,10 @@ const menuItemList = [
     to: "/state-of-js",
     label: "state-of-js",
   },
+  {
+    to: "/think",
+    label: "思考总结",
+  },
 ];
 
 export default function ResponsiveDrawer() {

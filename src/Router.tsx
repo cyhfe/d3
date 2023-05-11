@@ -7,6 +7,7 @@ import { MidiViz } from "./routes/MidiViz/index";
 import BarChart from "./routes/barChart";
 import AreaChart from "./routes/areaChart";
 import StateOfJs from "./routes/stateOfJs";
+import Think from "./routes/think.mdx";
 
 import Home from "./routes/Home.mdx";
 
@@ -18,6 +19,10 @@ const router = createBrowserRouter([
       {
         path: "/",
         element: <Home />,
+      },
+      {
+        path: "/think",
+        element: <Think />,
       },
       {
         path: "/midi-viz",

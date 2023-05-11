@@ -1,0 +1,35 @@
+# 问题总结及思考
+
+d3 操作 dom 应该分为两类: 创建 | 更新
+
+最初我是这样写的
+
+```tsx
+useEffect(() => {
+  const remove = draw()
+  return () => {
+    remove()
+  }
+}, [data, ...])
+```
+
+每当依赖变化时,移除 `ref`下的所有 svg 元素.重新绘制.
+
+这样有两个问题:
+
+1. 性能问题: 每次都全量渲染,变量 scale,数据的迭代处理,全部都重新计算
+2. 过渡动画不生效: 其实也是上述原因,依赖变化,会执行 effect cleanup,dom 已经卸载了自然不存在退出动画.
+
+解决方案:
+
+React 预先渲染 svg g 元素,d3 通过 select 选择元素进行操作.
+data-binding 的元素 d3 自己会 diff 然后更新.
+
+后续:
+
+看过的几本书: d3 in action, Integrating D3.js with React,
+演示的 demo 都存在这个问题.网上也没找到好的实践.
+
+感觉应该优先考虑用 React 渲染,先尝试下`visx`这个库
+
+学习最佳实践的方式就是看成熟的相关库.
