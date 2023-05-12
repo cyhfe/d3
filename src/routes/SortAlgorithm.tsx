@@ -1,6 +1,6 @@
 import Chart from "../components/Chart";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState, useTransition } from "react";
 import * as d3 from "d3";
 import {
   Box,
@@ -37,6 +37,8 @@ function App() {
   const [startSorting, setStartSorting] = useState(false);
   const stopSortRef = useRef(false);
 
+  const [isPending, startTransition] = useTransition();
+
   const selectionSort = useCallback(
     async function selectionSort() {
       const nums = [...data];
@@ -50,10 +52,12 @@ function App() {
         [nums[i], nums[minIndex]] = [nums[minIndex], nums[i]];
         if (stopSortRef.current) break;
         await sleep(600);
-        setData((prev) => {
-          const next = [...prev];
-          [next[i], next[minIndex]] = [next[minIndex], next[i]];
-          return next;
+        startTransition(() => {
+          setData((prev) => {
+            const next = [...prev];
+            [next[i], next[minIndex]] = [next[minIndex], next[i]];
+            return next;
+          });
         });
       }
       setIsSorting(false);
@@ -91,11 +95,13 @@ function App() {
             // }, 500);
 
             // 我们想要的效果是执行完 setData 再重新定义计时器
-            await sleep(500);
-            setData((prev) => {
-              const next = [...prev];
-              [next[j], next[j + 1]] = [next[j + 1], next[j]];
-              return next;
+            // await sleep(500);
+            startTransition(() => {
+              setData((prev) => {
+                const next = [...prev];
+                [next[j], next[j + 1]] = [next[j + 1], next[j]];
+                return next;
+              });
             });
           }
         }
