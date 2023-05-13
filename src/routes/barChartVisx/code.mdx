@@ -1,0 +1,80 @@
+### Group
+
+一般来说`<g>`元素是用来偏移或者让子元素继承字体颜色大小等信息.
+这里就是为了方便设置偏移量 top, left.
+因为 transform 写起来太繁琐了,深有体会.
+
+问题:
+innerRef 从 props 接受 ref?这种形式不是应该用 forwardRef 吗?
+
+```tsx
+import React from "react";
+import cx from "classnames";
+
+type GroupProps = {
+  /** Top offset applied to `<g/>`. */
+  top?: number;
+  /** Left offset applied to `<g/>`. */
+  left?: number;
+  /** Override `top` and `left` to provide the entire `transform` string. */
+  transform?: string;
+  /** className to apply to `<g/>`. */
+  className?: string;
+  children?: React.ReactNode;
+  /** ref to underlying `<g/>`. */
+  innerRef?: React.Ref<SVGGElement>;
+};
+
+export default function Group({
+  top = 0,
+  left = 0,
+  transform,
+  className,
+  children,
+  innerRef,
+  ...restProps
+}: GroupProps & Omit<React.SVGProps<SVGGElement>, keyof GroupProps>) {
+  return (
+    <g
+      ref={innerRef}
+      className={cx("visx-group", className)}
+      transform={transform || `translate(${left}, ${top})`}
+      {...restProps}
+    >
+      {children}
+    </g>
+  );
+}
+```
+
+### xScale,yScale 用 Memo 优化
+
+### Bar
+
+```tsx
+import React from "react";
+import cx from "classnames";
+import { AddSVGProps } from "../types";
+
+export type BarProps = {
+  /** className to apply to rect element. */
+  className?: string;
+  /** reference to rect element. */
+  innerRef?: React.Ref<SVGRectElement>;
+};
+
+export default function Bar({
+  className,
+  innerRef,
+  ...restProps
+}: AddSVGProps<BarProps, SVGRectElement>) {
+  return (
+    <rect ref={innerRef} className={cx("visx-bar", className)} {...restProps} />
+  );
+}
+```
+
+### 总结
+
+这两个组件啥也没干!
+就一个渐变还是设计的事

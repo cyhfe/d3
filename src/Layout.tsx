@@ -37,6 +37,10 @@ const menuItemList = [
     label: "barChart-React渲染",
   },
   {
+    to: "/bar-chart-visx",
+    label: "barChart-visx",
+  },
+  {
     to: "/area-chart",
     label: "areaChart",
   },
