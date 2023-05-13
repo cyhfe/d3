@@ -1,3 +1,50 @@
+#### 问题
+
+思路有问题:
+
+一开始我想的是排序的每一步都去 setState 更新.
+
+在事件处理中,多个 setState 会合并(batch update)
+
+最后用了`await sleep(600)`延迟触发每一步的 setState
+
+React 的新 API: `useTransition`用来执行低优先级的任务.
+
+#### 解决
+
+// todo
+不应该把排序步骤当做状态来看待.
+应该用动画来实现.
+考虑用 React Spring 来实现.
+水平有限,熟悉了动画后再重写
+
+```tsx
+async function selectionSort() {
+  const nums = [...data];
+  for (let i = 0; i < nums.length; i++) {
+    let minIndex = i;
+    for (let j = i + 1; j < nums.length; j++) {
+      if (nums[j] < nums[minIndex]) {
+        minIndex = j;
+      }
+    }
+    [nums[i], nums[minIndex]] = [nums[minIndex], nums[i]];
+    if (stopSortRef.current) break;
+    await sleep(600);
+    startTransition(() => {
+      setData((prev) => {
+        const next = [...prev];
+        [next[i], next[minIndex]] = [next[minIndex], next[i]];
+        return next;
+      });
+    });
+  }
+  setIsSorting(false);
+  setStartSorting(false);
+  stopSortRef.current = false;
+}
+```
+
 ```tsx
 import Chart from "../../components/Chart";
 
