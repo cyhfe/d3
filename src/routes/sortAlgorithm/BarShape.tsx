@@ -1,6 +1,6 @@
 import * as d3 from "d3";
 import { useCallback, useEffect, useRef } from "react";
-import { color } from "../color";
+import { color } from "../../color";
 interface BarShapeProps {
   data: number[];
   innerHeight: number;

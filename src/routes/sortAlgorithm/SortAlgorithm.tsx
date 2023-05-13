@@ -1,4 +1,4 @@
-import Chart from "../../components/Chart";
+import Chart from "./Chart";
 import Code from "./code.mdx";
 import { useCallback, useEffect, useRef, useState, useTransition } from "react";
 import * as d3 from "d3";

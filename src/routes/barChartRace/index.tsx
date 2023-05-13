@@ -85,6 +85,7 @@ function BarChartRace() {
               viewWidth={viewWidth}
               viewHeight={viewHeight}
               margin={margin}
+              style={{ maxWidth: 1200 }}
             >
               <g className="inner-chart" ref={innerChartRef}></g>
             </ChartContainer>
