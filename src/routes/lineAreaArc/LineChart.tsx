@@ -4,6 +4,7 @@ import { Data, LineChartProps } from "./types";
 import { css } from "@emotion/react";
 
 import locale from "d3-time-format/locale/zh-CN";
+import { GradientOrangeRed } from "@visx/gradient";
 
 d3.timeFormatDefaultLocale(locale as d3.TimeLocaleDefinition);
 
@@ -63,74 +64,124 @@ function LineChart({ data }: LineChartProps) {
           max-width: 960px;
         `}
       >
-        <g className="path">
-          <path d={pathGenerator(data)} fill="none" stroke="steelblue" />
-        </g>
-        <g className="area">
-          <path d={areaGenerator(data)} fillOpacity={0.2} />
-        </g>
-        <g className="arc">
-          {data.map((d) => {
-            return (
-              <circle
-                key={d.date.toString()}
-                cx={xScale(d.date)}
-                cy={yScale(d.avg_temp_F)}
-                r={2}
-              />
-            );
-          })}
-        </g>
-        <g className="x-axis" transform={`translate(0, ${innerHeight})`}>
-          <line x1={0} y1={0} x2={innerWidth} y2={0} stroke="red" />
-          {timeTicks.map((d) => {
-            const currentMonth = d;
-            const nextMonth = new Date(2021, currentMonth.getMonth() + 1, 1);
-            const offset = (xScale(nextMonth) - xScale(currentMonth)) / 2;
-            return (
-              <g key={d.toString()}>
-                <text x={xScale(d) + offset} y={24} textAnchor="middle">
-                  {formatMonth(d)}
-                </text>
-                <line
-                  x1={xScale(d)}
-                  y1={0}
-                  x2={xScale(d)}
-                  y2={10}
-                  stroke="red"
+        <GradientOrangeRed id="orange" />
+        <g
+          css={css`
+            font-size: 8px;
+            font-weight: lighter;
+          `}
+        >
+          <g className="area">
+            <path
+              d={areaGenerator(data)}
+              fillOpacity={1}
+              fill="url(#orange)"
+              stroke="none"
+            />
+          </g>
+          <g className="path">
+            <path d={pathGenerator(data)} fill="none" stroke="white" />
+          </g>
+          <g className="arc">
+            {data.map((d) => {
+              return (
+                <circle
+                  key={d.date.toString()}
+                  cx={xScale(d.date)}
+                  cy={yScale(d.avg_temp_F)}
+                  r={2}
+                  fill="steelblue"
                 />
-              </g>
-            );
-          })}
-        </g>
-        <g className="y-axis">
-          <line x1={0} y1={0} x2={0} y2={innerHeight} stroke="red" />
-          {yTicks.map((d) => {
-            return (
-              <g key={d}>
-                <text
-                  x={-15}
-                  y={yScale(d)}
-                  textAnchor="end"
-                  alignmentBaseline="central"
-                >
-                  {d}
-                </text>
-                <line
-                  x1={0}
-                  x2={-10}
-                  y1={yScale(d)}
-                  y2={yScale(d)}
-                  stroke="red"
-                />
-              </g>
-            );
-          })}
-        </g>
-        <g className="label">
-          <text textAnchor="middle" x={0} y={-25} alignmentBaseline="central">
-            温度(°F)
-          </text>
+              );
+            })}
+          </g>
+          <g className="x-axis" transform={`translate(0, ${innerHeight})`}>
+            <line x1={0} y1={0} x2={innerWidth} y2={0} stroke="steelblue" />
+            {timeTicks.map((d) => {
+              const currentMonth = d;
+              const nextMonth = new Date(2021, currentMonth.getMonth() + 1, 1);
+              const offset = (xScale(nextMonth) - xScale(currentMonth)) / 2;
+              return (
+                <g key={d.toString()}>
+                  <text x={xScale(d) + offset} y={12} textAnchor="middle">
+                    {formatMonth(d)}
+                  </text>
+                  <line
+                    x1={xScale(d)}
+                    y1={0}
+                    x2={xScale(d)}
+                    y2={4}
+                    stroke="steelblue"
+                  />
+                </g>
+              );
+            })}
+          </g>
+          <g className="y-axis">
+            <line x1={0} y1={0} x2={0} y2={innerHeight} stroke="steelblue" />
+            {yTicks.map((d) => {
+              return (
+                <g key={d}>
+                  <text
+                    x={-10}
+                    y={yScale(d)}
+                    textAnchor="end"
+                    alignmentBaseline="central"
+                  >
+                    {d}
+                  </text>
+                  <line
+                    x1={0}
+                    x2={-4}
+                    y1={yScale(d)}
+                    y2={yScale(d)}
+                    stroke="steelblue"
+                  />
+                </g>
+              );
+            })}
+          </g>
+          <g className="label">
+            <text textAnchor="middle" x={0} y={-25} alignmentBaseline="central">
+              温度(°F)
+            </text>
+          </g>
+          <g className="annotation">
+            <g
+              transform={`translate(${xScale(
+                data[data.length - 4].date
+              )}, ${yScale(data[data.length - 4].max_temp_F)})`}
+            >
+              <text x={20} y={-25} textAnchor="start">
+                最高温度(日)
+              </text>
+              <line
+                x1={5}
+                y1={-5}
+                x2={20}
+                y2={-20}
+                stroke="steelblue"
+                strokeWidth={2}
+              ></line>
+            </g>
+            <g
+              transform={`translate(${xScale(
+                data[data.length - 3].date
+              )}, ${yScale(data[data.length - 3].min_temp_F)})`}
+            >
+              <text x={0} y={40} textAnchor="middle">
+                最低温度(日)
+              </text>
+              <line
+                x1={0}
+                y1={5}
+                x2={0}
+                y2={25}
+                stroke="steelblue"
+                strokeWidth={2}
+              ></line>
+            </g>
+          </g>
         </g>
       </ChartContainer>
     </div>

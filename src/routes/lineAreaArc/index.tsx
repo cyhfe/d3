@@ -2,6 +2,7 @@ import * as d3 from "d3";
 import React, { useEffect, useState } from "react";
 import LineChart from "./LineChart";
 import { Data } from "./types";
+import { Card, CardContent } from "@mui/material";
 
 function LineAreaArc() {
   const [data, setData] = useState<Data[] | null>(null);
@@ -16,11 +17,13 @@ function LineAreaArc() {
     getData();
   }, []);
 
-  useEffect(() => {
-    console.log(data);
-  }, [data]);
-
-  return <div>{data && <LineChart data={data} />}</div>;
+  return (
+    <div>
+      <Card>
+        <CardContent>{data && <LineChart data={data} />}</CardContent>
+      </Card>
+    </div>
+  );
 }
 
 export default LineAreaArc;
