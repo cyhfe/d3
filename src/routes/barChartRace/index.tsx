@@ -4,6 +4,8 @@ import * as d3 from "d3";
 import { useEffect, useRef, useState } from "react";
 import useChart from "./useChart";
 import README from "./README.mdx";
+
+import Code from "./code.mdx";
 interface Data {
   date: Date;
   name: string;
@@ -88,6 +90,9 @@ function BarChartRace() {
             </ChartContainer>
           </CardContent>
         </Card>
+      </Box>
+      <Box>
+        <Code />
       </Box>
     </Box>
   );

@@ -1,3 +1,4 @@
+```tsx
 import { useCallback, useEffect, useRef, useState } from "react";
 import { css } from "@emotion/react";
 import { Midi } from "@tonejs/midi";
@@ -7,8 +8,6 @@ import { NoteJSON } from "@tonejs/midi/dist/Note";
 import * as d3 from "d3";
 import { useScale } from "./useScale";
 import Post from "./post.mdx";
-import Code from "./code.mdx";
-
 function MidiViz() {
   const [midiData, setMidiData] = useState<Midi | null>(null);
   const [notes, setNotes] = useState<NoteJSON[]>([]);
@@ -131,9 +130,18 @@ function MidiViz() {
         setNotes={setNotes}
         data={midiData}
       />
-      <Code />
+
+      <svg
+        viewBox="0 0 600 300"
+        css={css`
+          display: block;
+          /* width: 100%;
+          height: 10%; */
+        `}
+      ></svg>
     </div>
   );
 }
 
 export { MidiViz };
+```

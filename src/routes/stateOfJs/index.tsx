@@ -11,9 +11,7 @@ import {
 import Chart from "./Chart";
 
 import type { Data } from "./types";
-
-import Post from "./post.mdx";
-
+import Code from "./code.mdx";
 function ChartRoot() {
   const [data, setData] = useState<Data | null>(null);
   const [filter, setFilter] = useState<string>("usage");
@@ -73,7 +71,7 @@ function ChartRoot() {
               <Chart data={data} filter={filter} />
             </CardContent>
           </Card>
-          <Post />
+          <Code />
         </>
       )}
     </>

@@ -1,7 +1,7 @@
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 
 import Layout from "./Layout";
-import SortAlgorithm from "./routes/SortAlgorithm";
+import SortAlgorithm from "./routes/sortAlgorithm/SortAlgorithm";
 import BarChartRace from "./routes/barChartRace";
 import { MidiViz } from "./routes/MidiViz/index";
 import BarChart from "./routes/barChart";
