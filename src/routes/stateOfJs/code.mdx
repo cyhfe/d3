@@ -1,3 +1,42 @@
+### 问题
+
+`path`过渡没问题,data 绑定
+
+```tsx
+pathGroup
+  .selectAll<SVGPathElement, Item>("path")
+  .data<Item>(data.items, (d) => d.id) //key
+  .join("path")
+  .attr("stroke", (d) => String(colorScale(d.id)))
+  .attr("stroke-width", 3)
+  .attr("fill", "none")
+  .transition(transition)
+  .attr("d", (d) => pathGenerator(d[filter]));
+```
+
+`label`过渡动画有问题,无 key 绑定每次都重新渲染,无法实现过渡
+
+data 从祖先传递下来,怎么绑定 key?
+
+重新`.data().join`应该可以实现.
+
+暂时不修改,后续用 React 渲染重写
+
+```tsx
+textGroup
+  .append("text")
+  .text((d) => {
+    return Math.round(d.percentageQuestion);
+  }) //??怎么绑定 key
+  .attr("fill", "black")
+  .attr("text-anchor", "middle")
+  .attr("alignment-baseline", "central")
+  .attr("font-size", 6)
+  .attr("font-weight", "bold");
+```
+
+#### Chart
+
 ```tsx
 import { useEffect, useRef } from "react";
 import * as d3 from "d3";

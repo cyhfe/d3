@@ -17,6 +17,35 @@ const menuItemList = [
     label: "README",
   },
   {
+    to: "/line-area-arc",
+    label: "line-area-arc",
+  },
+  {
+    to: "/state-of-js",
+    label: "state-of-js",
+  },
+  {
+    to: "/area-chart",
+    label: "areaChart",
+  },
+  {
+    to: "/bar-chart",
+    label: "barChart-D3渲染",
+  },
+  {
+    to: "/think",
+    label: "D3渲染的一些总结",
+  },
+  {
+    to: "/bar-chart-react",
+    label: "barChart-React渲染",
+  },
+  {
+    to: "/bar-chart-visx",
+    label: "barChart-visx",
+  },
+
+  {
     to: "/midi-viz",
     label: "MIDI音符可视化",
   },
@@ -27,34 +56,6 @@ const menuItemList = [
   {
     to: "/bar-chart-race",
     label: "趋势图动态排序",
-  },
-  {
-    to: "/bar-chart",
-    label: "barChart-D3渲染",
-  },
-  {
-    to: "/bar-chart-react",
-    label: "barChart-React渲染",
-  },
-  {
-    to: "/bar-chart-visx",
-    label: "barChart-visx",
-  },
-  {
-    to: "/area-chart",
-    label: "areaChart",
-  },
-  {
-    to: "/state-of-js",
-    label: "state-of-js",
-  },
-  {
-    to: "/line-area-arc",
-    label: "line-area-arc",
-  },
-  {
-    to: "/think",
-    label: "思考总结",
   },
 ];
 

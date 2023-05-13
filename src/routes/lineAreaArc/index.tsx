@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import LineChart from "./LineChart";
 import { Data } from "./types";
 import { Card, CardContent } from "@mui/material";
-
+import Code from "./code.mdx";
 function LineAreaArc() {
   const [data, setData] = useState<Data[] | null>(null);
   useEffect(() => {
@@ -22,6 +22,7 @@ function LineAreaArc() {
       <Card>
         <CardContent>{data && <LineChart data={data} />}</CardContent>
       </Card>
+      <Code />
     </div>
   );
 }
