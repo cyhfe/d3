@@ -5,6 +5,7 @@ import SortAlgorithm from "./routes/SortAlgorithm";
 import BarChartRace from "./routes/barChartRace";
 import { MidiViz } from "./routes/MidiViz/index";
 import BarChart from "./routes/barChart";
+import BarChartReact from "./routes/barChartReact";
 import AreaChart from "./routes/areaChart";
 import StateOfJs from "./routes/stateOfJs";
 import Think from "./routes/think.mdx";
@@ -39,6 +40,10 @@ const router = createBrowserRouter([
       {
         path: "/bar-chart",
         element: <BarChart />,
+      },
+      {
+        path: "/bar-chart-react",
+        element: <BarChartReact />,
       },
       {
         path: "/area-chart",

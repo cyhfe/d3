@@ -30,7 +30,11 @@ const menuItemList = [
   },
   {
     to: "/bar-chart",
-    label: "barChart",
+    label: "barChart-D3渲染",
+  },
+  {
+    to: "/bar-chart-react",
+    label: "barChart-React渲染",
   },
   {
     to: "/area-chart",
