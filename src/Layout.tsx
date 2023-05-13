@@ -44,7 +44,6 @@ const menuItemList = [
     to: "/bar-chart-visx",
     label: "barChart-visx",
   },
-
   {
     to: "/midi-viz",
     label: "MIDI音符可视化",
