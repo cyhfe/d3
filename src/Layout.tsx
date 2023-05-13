@@ -49,6 +49,10 @@ const menuItemList = [
     label: "state-of-js",
   },
   {
+    to: "/line-area-arc",
+    label: "line-area-arc",
+  },
+  {
     to: "/think",
     label: "思考总结",
   },
