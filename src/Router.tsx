@@ -13,6 +13,7 @@ import Think from "./routes/think.mdx";
 
 import Home from "./routes/Home.mdx";
 import LineAreaArc from "./routes/lineAreaArc";
+import Map from "./routes/map";
 
 const router = createBrowserRouter([
   {
@@ -62,6 +63,10 @@ const router = createBrowserRouter([
       {
         path: "/line-area-arc",
         element: <LineAreaArc />,
+      },
+      {
+        path: "/map",
+        element: <Map />,
       },
     ],
   },

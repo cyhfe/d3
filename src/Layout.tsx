@@ -21,6 +21,10 @@ const menuItemList = [
     label: "line-area-arc",
   },
   {
+    to: "/map",
+    label: "map",
+  },
+  {
     to: "/state-of-js",
     label: "state-of-js",
   },
