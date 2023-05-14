@@ -6,7 +6,7 @@ import * as d3 from "d3";
 import { Button, ButtonGroup, Card, CardContent } from "@mui/material";
 import { Tooltip, useTooltip } from "@visx/tooltip";
 
-function WorldMap({ world, laureates }: WorldMapProps) {
+function WorldMap({ world, laureates, city }: WorldMapProps) {
   const [mode, setMode] = useState<"city" | "country">("country");
   const width = 1230;
   const height = 620;
@@ -20,28 +20,12 @@ function WorldMap({ world, laureates }: WorldMapProps) {
 
   const graticuleGenerator = d3.geoGraticule();
 
-  const cities = [];
-  laureates.forEach((laureate) => {
-    if (laureate.birth_country !== "" && laureate.birth_city !== "") {
-      const relatedCity =
-        cities.find((city) => city.city === laureate.birth_city) &&
-        cities.find((city) => city.country === laureate.birth_country);
-
-      if (relatedCity) {
-        relatedCity.laureates.push(laureate);
-      } else {
-        cities.push({
-          city: laureate.birth_city,
-          country: laureate.birth_country,
-          latitude: laureate.birt_city_latitude,
-          longitude: laureate.birt_city_longitude,
-          laureates: [laureate],
-        });
-      }
-    }
-  });
-
   const colorScale = d3.scaleSequential(d3.interpolateYlGnBu).domain([1, 100]);
+  const cityScale = d3
+    .scaleRadial()
+    .domain([0, d3.max(d3.map(city, (d) => d.laureates.length))])
+    .range([0, 25]);
+
   const {
     showTooltip,
     hideTooltip,
@@ -101,6 +85,7 @@ function WorldMap({ world, laureates }: WorldMapProps) {
                     fillOpacity={mode === "country" ? 1 : 0}
                     d={geoPathGenerator(d)}
                     onMouseMove={(e) => {
+                      if (mode !== "country") return;
                       const containerX = e.clientX;
                       const containerY = e.clientY;
                       showTooltip({
@@ -110,11 +95,40 @@ function WorldMap({ world, laureates }: WorldMapProps) {
                       });
                     }}
                     onMouseLeave={() => {
+                      if (mode !== "country") return;
                       hideTooltip();
                     }}
                   />
                 );
               })}
+              {mode === "city" &&
+                city.map((d) => {
+                  return (
+                    <circle
+                      key={d.city}
+                      cx={projection([d.longitude, d.latitude])[0]}
+                      cy={projection([d.longitude, d.latitude])[1]}
+                      r={cityScale(d.laureates.length)}
+                      fill={"#35a7c2"}
+                      fillOpacity={0.5}
+                      stroke={"#35a7c2"}
+                      onMouseMove={(e) => {
+                        if (mode !== "city") return;
+                        const containerX = e.clientX;
+                        const containerY = e.clientY;
+                        showTooltip({
+                          tooltipLeft: containerX,
+                          tooltipTop: containerY,
+                          tooltipData: `${d.city}, ${d.laureates.length} 获奖者`,
+                        });
+                      }}
+                      onMouseLeave={() => {
+                        if (mode !== "city") return;
+                        hideTooltip();
+                      }}
+                    />
+                  );
+                })}
             </g>
 
             {/* tooltip */}
