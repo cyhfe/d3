@@ -5,6 +5,11 @@ import { css } from "@emotion/react";
 import * as d3 from "d3";
 import { Button, ButtonGroup, Card, CardContent } from "@mui/material";
 import { Tooltip, useTooltip } from "@visx/tooltip";
+import { LinearGradient } from "@visx/gradient";
+
+// function MapColor({ id }) => {
+//   return <LinearGradient id={id} from="#351CAB" to="#621A61" />
+// }
 
 function WorldMap({ world, laureates, city }: WorldMapProps) {
   const [mode, setMode] = useState<"city" | "country">("country");
@@ -80,11 +85,19 @@ function WorldMap({ world, laureates, city }: WorldMapProps) {
               outline: 1px solid red;
             `}
           >
+            <defs>
+              <linearGradient id="Gradient1">
+                <stop stopColor={"rgba(255,255,217,1)"} offset="0%" />
+                <stop stopColor={"rgba(76,183,193,1)"} offset="50%" />
+                <stop stopColor={"rgba(9,30,90,1)"} offset="100%" />
+              </linearGradient>
+            </defs>
+
             {/* city legend */}
             {mode === "city" && (
-              <g fill={"transparent"} stroke={"#09131b"}>
+              <g fill={"transparent"} stroke={"#09131b"} x={0} y={0}>
                 <text x={-maxRadius} y={-50} fill={"#09131b"} stroke="none">
-                  比例尺: 半径-人数
+                  比例尺: 获奖人数对应半径
                 </text>
                 <g>
                   <circle cx={0} cy={maxRadius - minRadius} r={minRadius} />
@@ -147,6 +160,22 @@ function WorldMap({ world, laureates, city }: WorldMapProps) {
                     {laureatesMax}
                   </text>
                 </g>
+              </g>
+            )}
+
+            {/* contry legend */}
+            {mode === "country" && (
+              <g x={0} y={0}>
+                <rect width={100} height={10} fill="url(#Gradient1)" />
+                <text textAnchor="middle" y={-6}>
+                  0
+                </text>
+                <text textAnchor="middle" x={100} y={-6}>
+                  {laureatesMax}
+                </text>
+                <text textAnchor="start" x={0} y={-35}>
+                  比例尺获奖人数对应颜色
+                </text>
               </g>
             )}
 
