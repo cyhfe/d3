@@ -73,6 +73,9 @@ function LineChart({ data }: LineChartProps) {
         >
           <g className="area">
             <path
+              onClick={() => {
+                console.log("click");
+              }}
               d={areaGenerator(data)}
               fillOpacity={1}
               fill="url(#orange)"
