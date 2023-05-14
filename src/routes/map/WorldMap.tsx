@@ -1,13 +1,13 @@
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { WorldMapProps, Laureates } from "./types";
 import ChartContainer from "../../components/ChartContainer";
 import { css } from "@emotion/react";
 import * as d3 from "d3";
-import { Card, CardContent } from "@mui/material";
+import { Button, ButtonGroup, Card, CardContent } from "@mui/material";
 import { Tooltip, useTooltip } from "@visx/tooltip";
-import useThrottle from "../../utils/useThrottle";
 
 function WorldMap({ world, laureates }: WorldMapProps) {
+  const [mode, setMode] = useState<"city" | "country">("country");
   const width = 1230;
   const height = 620;
 
@@ -20,7 +20,28 @@ function WorldMap({ world, laureates }: WorldMapProps) {
 
   const graticuleGenerator = d3.geoGraticule();
 
-  const colorScale = d3.scaleSequential(d3.interpolateGnBu).domain([1, 100]);
+  const cities = [];
+  laureates.forEach((laureate) => {
+    if (laureate.birth_country !== "" && laureate.birth_city !== "") {
+      const relatedCity =
+        cities.find((city) => city.city === laureate.birth_city) &&
+        cities.find((city) => city.country === laureate.birth_country);
+
+      if (relatedCity) {
+        relatedCity.laureates.push(laureate);
+      } else {
+        cities.push({
+          city: laureate.birth_city,
+          country: laureate.birth_country,
+          latitude: laureate.birt_city_latitude,
+          longitude: laureate.birt_city_longitude,
+          laureates: [laureate],
+        });
+      }
+    }
+  });
+
+  const colorScale = d3.scaleSequential(d3.interpolateYlGnBu).domain([1, 100]);
   const {
     showTooltip,
     hideTooltip,
@@ -32,20 +53,24 @@ function WorldMap({ world, laureates }: WorldMapProps) {
     tooltipOpen: false,
   });
 
-  const handleMove = useThrottle((e, d) => {
-    const containerX = e.clientX;
-    const containerY = e.clientY;
-    showTooltip({
-      tooltipLeft: containerX,
-      tooltipTop: containerY,
-      tooltipData: `${d.properties.name}, ${d.properties.laureates.length} 获奖者`,
-    });
-  }, 10);
-
   return (
     <div>
       <Card>
         <CardContent>
+          <ButtonGroup>
+            <Button
+              onClick={() => setMode("country")}
+              color={mode === "city" ? "primary" : "secondary"}
+            >
+              按国家
+            </Button>
+            <Button
+              onClick={() => setMode("city")}
+              color={mode === "country" ? "primary" : "secondary"}
+            >
+              按城市
+            </Button>
+          </ButtonGroup>
           <ChartContainer
             viewHeight={height}
             viewWidth={width}
@@ -72,8 +97,18 @@ function WorldMap({ world, laureates }: WorldMapProps) {
                     }
                     stroke="#09131b"
                     strokeOpacity={0.4}
+                    // strokeOpacity={mode === "country" ? 0.4 : 0}
+                    fillOpacity={mode === "country" ? 1 : 0}
                     d={geoPathGenerator(d)}
-                    onMouseMove={(e) => handleMove(e, d)}
+                    onMouseMove={(e) => {
+                      const containerX = e.clientX;
+                      const containerY = e.clientY;
+                      showTooltip({
+                        tooltipLeft: containerX,
+                        tooltipTop: containerY,
+                        tooltipData: `${d.properties.name}, ${d.properties.laureates.length} 获奖者`,
+                      });
+                    }}
                     onMouseLeave={() => {
                       hideTooltip();
                     }}
