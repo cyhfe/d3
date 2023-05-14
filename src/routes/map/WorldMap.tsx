@@ -1,26 +1,22 @@
-import { useEffect, useMemo, useState } from "react";
-import { WorldMapProps, Laureates } from "./types";
+import { useState } from "react";
+import { WorldMapProps } from "./types";
 import ChartContainer from "../../components/ChartContainer";
-import { css } from "@emotion/react";
+
 import * as d3 from "d3";
-import { Button, ButtonGroup, Card, CardContent } from "@mui/material";
+import { Box, Button, ButtonGroup, Card, CardContent } from "@mui/material";
 import { Tooltip, useTooltip } from "@visx/tooltip";
-import { LinearGradient } from "@visx/gradient";
+import { GradientPinkBlue } from "@visx/gradient";
 
-// function MapColor({ id }) => {
-//   return <LinearGradient id={id} from="#351CAB" to="#621A61" />
-// }
-
-function WorldMap({ world, laureates, city }: WorldMapProps) {
-  const [mode, setMode] = useState<"city" | "country">("country");
+function WorldMap({ world, city }: WorldMapProps) {
+  const [mode, setMode] = useState<"city" | "country">("city");
   const width = 1230;
   const height = 720;
 
   const margin = {
-    left: 30,
-    bottom: 30,
+    left: 50,
+    bottom: 50,
     top: 80,
-    right: 30,
+    right: 50,
   };
 
   const innerWidth = width - margin.left - margin.right;
@@ -63,28 +59,23 @@ function WorldMap({ world, laureates, city }: WorldMapProps) {
     <div>
       <Card>
         <CardContent>
-          <ButtonGroup>
-            <Button
-              onClick={() => setMode("country")}
-              color={mode === "city" ? "primary" : "secondary"}
-            >
-              按国家
-            </Button>
-            <Button
-              onClick={() => setMode("city")}
-              color={mode === "country" ? "primary" : "secondary"}
-            >
-              按城市
-            </Button>
-          </ButtonGroup>
-          <ChartContainer
-            viewHeight={height}
-            viewWidth={width}
-            margin={margin}
-            css={css`
-              outline: 1px solid red;
-            `}
-          >
+          <Box mb={2}>
+            <ButtonGroup>
+              <Button
+                onClick={() => setMode("city")}
+                color={mode === "country" ? "primary" : "secondary"}
+              >
+                按城市
+              </Button>
+              <Button
+                onClick={() => setMode("country")}
+                color={mode === "city" ? "primary" : "secondary"}
+              >
+                按国家
+              </Button>
+            </ButtonGroup>
+          </Box>
+          <ChartContainer viewHeight={height} viewWidth={width} margin={margin}>
             <defs>
               <linearGradient id="Gradient1">
                 <stop stopColor={"rgba(255,255,217,1)"} offset="0%" />
@@ -92,7 +83,18 @@ function WorldMap({ world, laureates, city }: WorldMapProps) {
                 <stop stopColor={"rgba(9,30,90,1)"} offset="100%" />
               </linearGradient>
             </defs>
-
+            <GradientPinkBlue id="pinkblue" />
+            {/* outline */}
+            <rect
+              x={-margin.left}
+              y={-margin.top}
+              width={width}
+              height={height}
+              stroke="url(#pinkblue)"
+              fill="none"
+              strokeDasharray={"6, 4"}
+              strokeWidth={2}
+            />
             {/* city legend */}
             {mode === "city" && (
               <g fill={"transparent"} stroke={"#09131b"} x={0} y={0}>

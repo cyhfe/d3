@@ -37,7 +37,7 @@ function App() {
   const [startSorting, setStartSorting] = useState(false);
   const stopSortRef = useRef(false);
 
-  const [isPending, startTransition] = useTransition();
+  const [, startTransition] = useTransition();
 
   const selectionSort = useCallback(
     async function selectionSort() {

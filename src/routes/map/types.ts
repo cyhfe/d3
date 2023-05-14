@@ -28,7 +28,6 @@ export type GeoJSON = FeatureCollection<
 
 export interface WorldMapProps {
   world: GeoJSON;
-  laureates: Laureates[];
   city: City[];
 }
 

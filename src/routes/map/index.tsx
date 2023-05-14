@@ -3,6 +3,7 @@ import Post from "./post.mdx";
 import * as d3 from "d3";
 import { City, GeoJSON, Laureates } from "./types";
 import WorldMap from "./WorldMap";
+import { Typography } from "@mui/material";
 
 function Map() {
   const [world, setWorld] = useState<GeoJSON | null>(null);
@@ -50,15 +51,12 @@ function Map() {
     getData();
   }, []);
 
-  // useEffect(() => {
-  //   console.log(world);
-  // }, [world]);
-
   return (
     <div>
-      {world && laureates && (
-        <WorldMap world={world} laureates={laureates} city={city} />
-      )}
+      <Typography variant="h4" gutterBottom>
+        诺贝尔奖与获奖者出生地的关系
+      </Typography>
+      {world && laureates && <WorldMap world={world} city={city} />}
       <Post />
     </div>
   );
