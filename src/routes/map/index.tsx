@@ -1,16 +1,28 @@
 import React, { useEffect, useState } from "react";
 import Post from "./post.mdx";
 import * as d3 from "d3";
-import { WorldJSON } from "./types";
+import { GeoJSON, Laureates } from "./types";
 import WorldMap from "./WorldMap";
 
 function Map() {
-  const [world, setWorld] = useState<WorldJSON | null>(null);
+  const [world, setWorld] = useState<GeoJSON | null>(null);
+  const [laureates, setLaureates] = useState<Laureates[] | null>(null);
 
   useEffect(() => {
     async function getData() {
-      const res = (await d3.json("data/map/world.json")) as WorldJSON;
-      setWorld(res);
+      const worldData = (await d3.json("data/map/world.json")) as GeoJSON;
+      const laureates = (await d3.json(
+        "data/map/laureates.json"
+      )) as Laureates[];
+
+      worldData.features.forEach((country) => {
+        country.properties.laureates = laureates.filter(
+          (laureate) => laureate.birth_country === country.properties.name
+        );
+      });
+
+      setWorld(worldData);
+      setLaureates(laureates);
     }
     getData();
   }, []);
@@ -21,7 +33,7 @@ function Map() {
 
   return (
     <div>
-      {world && <WorldMap data={world} />}
+      {world && laureates && <WorldMap world={world} laureates={laureates} />}
       <Post />
     </div>
   );
