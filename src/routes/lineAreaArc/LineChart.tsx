@@ -5,6 +5,8 @@ import { css } from "@emotion/react";
 
 import locale from "d3-time-format/locale/zh-CN";
 import { GradientOrangeRed } from "@visx/gradient";
+import { animated, useSpringRef, useTrail } from "@react-spring/web";
+import { useEffect } from "react";
 
 d3.timeFormatDefaultLocale(locale as d3.TimeLocaleDefinition);
 
@@ -54,6 +56,23 @@ function LineChart({ data }: LineChartProps) {
     .y1((d) => yScale(d.min_temp_F))
     .curve(d3.curveCatmullRom);
 
+  const arcApi = useSpringRef();
+  const arcTrail = useTrail(data.length, {
+    ref: arcApi,
+    from: {
+      opacity: 0,
+      scale: 0,
+    },
+    to: {
+      opacity: 1,
+      scale: 1,
+    },
+  });
+
+  useEffect(() => {
+    arcApi.start();
+  }, [arcApi]);
+
   return (
     <div>
       <ChartContainer
@@ -86,7 +105,24 @@ function LineChart({ data }: LineChartProps) {
             <path d={pathGenerator(data)} fill="none" stroke="white" />
           </g>
           <g className="arc">
-            {data.map((d) => {
+            {arcTrail.map((style, i) => {
+              return (
+                <animated.circle
+                  style={{
+                    transformOrigin: `${xScale(data[i].date)}px ${yScale(
+                      data[i].avg_temp_F
+                    )}px`,
+                    ...style,
+                  }}
+                  key={data[i].date.toString()}
+                  cx={xScale(data[i].date)}
+                  cy={yScale(data[i].avg_temp_F)}
+                  r={2}
+                  fill="steelblue"
+                />
+              );
+            })}
+            {/* {data.map((d) => {
               return (
                 <circle
                   key={d.date.toString()}
@@ -96,7 +132,7 @@ function LineChart({ data }: LineChartProps) {
                   fill="steelblue"
                 />
               );
-            })}
+            })} */}
           </g>
           <g className="x-axis" transform={`translate(0, ${innerHeight})`}>
             <line x1={0} y1={0} x2={innerWidth} y2={0} stroke="steelblue" />

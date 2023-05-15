@@ -15,6 +15,7 @@
     "@mdx-js/rollup": "^2.3.0",
     "@mui/icons-material": "^5.11.16",
     "@mui/material": "^5.12.3",
+    "@react-spring/web": "^9.7.2",
     "@tonejs/midi": "^2.0.28",
     "@types/geojson": "^7946.0.10",
     "@visx/gradient": "^3.0.0",
