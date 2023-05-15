@@ -135,6 +135,7 @@ function LineChart({ data }: LineChartProps) {
         step={0.1}
       />
       <div>
+        <animated.div>{pathStyle.t.to((v) => v)}</animated.div>
         <div>{t}</div>
       </div>
       <ChartContainer
@@ -172,21 +173,6 @@ function LineChart({ data }: LineChartProps) {
             </animated.path>
 
             <animated.path
-              strokeDasharray={pathStyle.t.to((a) => {
-                const length = pathRef.current?.getTotalLength();
-                console.log(length, lengthRef.current);
-                if (!length) return "";
-
-                return `${length * a} ${length}`;
-                // const value = `${
-                //   pathRef.current?.getTotalLength() * a
-                // },${pathRef.current?.getTotalLength()} `;
-                // return value;
-              })}
-              x={pathStyle.t.to((a) => {
-                console.log(a);
-                return a * 10;
-              })}
               d={areaGenerator(data)}
               fillOpacity={1}
               fill="url(#orange)"
@@ -200,6 +186,11 @@ function LineChart({ data }: LineChartProps) {
               stroke="white"
               ref={pathRef}
               strokeMiterlimit="1"
+              strokeDasharray={pathStyle.t.to((a) => {
+                const length = pathRef.current?.getTotalLength();
+                if (!length) return "";
+                return `${length * a} ${length}`;
+              })}
             />
           </g>
           <g className="arc">
