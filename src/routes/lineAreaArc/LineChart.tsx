@@ -6,7 +6,7 @@ import { css } from "@emotion/react";
 import locale from "d3-time-format/locale/zh-CN";
 import { GradientOrangeRed } from "@visx/gradient";
 import { animated, useSpringRef, useTrail } from "@react-spring/web";
-import { useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 
 d3.timeFormatDefaultLocale(locale as d3.TimeLocaleDefinition);
 
@@ -69,12 +69,23 @@ function LineChart({ data }: LineChartProps) {
     },
   });
 
+  const pathRef = useRef<SVGPathElement | null>(null);
+  const [t, setT] = useState(0);
+
   useEffect(() => {
     arcApi.start();
   }, [arcApi]);
 
   return (
     <div>
+      <input
+        type="range"
+        max={1}
+        min={0}
+        value={t}
+        onChange={(e) => setT(Number(e.target.value))}
+        step={0.01}
+      />
       <ChartContainer
         viewWidth={width}
         viewHeight={height}
@@ -102,7 +113,16 @@ function LineChart({ data }: LineChartProps) {
             />
           </g>
           <g className="path">
-            <path d={pathGenerator(data)} fill="none" stroke="white" />
+            <path
+              d={pathGenerator(data)}
+              fill="none"
+              stroke="white"
+              ref={pathRef}
+              strokeMiterlimit="1"
+              strokeDasharray={`${
+                pathRef.current?.getTotalLength() * t
+              },${pathRef.current?.getTotalLength()}`}
+            />
           </g>
           <g className="arc">
             {arcTrail.map((style, i) => {
