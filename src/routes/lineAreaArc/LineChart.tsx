@@ -5,14 +5,7 @@ import { css } from "@emotion/react";
 
 import locale from "d3-time-format/locale/zh-CN";
 import { GradientOrangeRed } from "@visx/gradient";
-import {
-  animated,
-  to,
-  useChain,
-  useSpring,
-  useSpringRef,
-  useTrail,
-} from "@react-spring/web";
+import { animated, useSpring, useSpringRef, useTrail } from "@react-spring/web";
 import { useEffect, useRef, useState } from "react";
 
 d3.timeFormatDefaultLocale(locale as d3.TimeLocaleDefinition);
@@ -77,6 +70,7 @@ function LineChart({ data }: LineChartProps) {
   });
 
   const pathRef = useRef<SVGPathElement | null>(null);
+
   const [t, setT] = useState(1);
 
   const pathApi = useSpringRef();
@@ -90,53 +84,38 @@ function LineChart({ data }: LineChartProps) {
         t,
       },
       config: {
-        duration: 3000,
+        duration: 1500,
       },
     }),
     [t]
   );
-
-  // useChain([arcApi, pathApi], [0, 1], 1500);
-  const lengthRef = useRef<number>(0);
-  useEffect(() => {
-    arcApi.start();
-  }, [arcApi]);
 
   useEffect(() => {
     pathApi.start();
   }, [pathApi, t]);
 
   useEffect(() => {
-    lengthRef.current = pathRef.current.getTotalLength();
-  }, [t]);
-
-  // useEffect(() => {
-  //   const length = pathRef.current.getTotalLength();
-  //   pathStyle.t.to((a) => {
-  //     console.log(a, "1", t);
-  //     const value = `${
-  //       pathRef.current?.getTotalLength() * a
-  //     },${pathRef.current?.getTotalLength()} `;
-  //     d3.select(pathRef.current).attr("stroke-dasharray", value);
-  //   });
-  // }, [pathStyle.t, t]);
+    arcApi.start();
+  }, [arcApi]);
 
   return (
     <div>
-      <input
-        type="range"
-        max={1}
-        min={0}
-        value={t}
-        onChange={(e) => {
-          console.log(e.target.value);
-          setT(Number(e.target.value));
-        }}
-        step={0.1}
-      />
       <div>
-        <animated.div>{pathStyle.t.to((v) => v)}</animated.div>
-        <div>{t}</div>
+        <input
+          type="range"
+          max={1}
+          min={0}
+          value={t}
+          onChange={(e) => {
+            setT(Number(e.target.value));
+          }}
+          step={0.1}
+        />
+      </div>
+      <div>
+        <div>状态: {t}</div>
+
+        <animated.div>{pathStyle.t.to((v) => `插值: ${v}`)}</animated.div>
       </div>
       <ChartContainer
         viewWidth={width}
@@ -155,24 +134,6 @@ function LineChart({ data }: LineChartProps) {
         >
           <g className="area">
             <animated.path
-              // style={{
-              //   x: pathStyle.t.to((a) => {
-              //     console.log(a);
-              //     return a * 10;
-              //   }),
-              // }}
-              x={pathStyle.t.to((a) => {
-                // console.log(a);
-                return a * 10;
-              })}
-            >
-              {pathStyle.t.to((a) => {
-                // console.log(a);
-                return a;
-              })}
-            </animated.path>
-
-            <animated.path
               d={areaGenerator(data)}
               fillOpacity={1}
               fill="url(#orange)"
@@ -184,6 +145,7 @@ function LineChart({ data }: LineChartProps) {
               d={pathGenerator(data)}
               fill="none"
               stroke="white"
+              strokeWidth={2}
               ref={pathRef}
               strokeMiterlimit="1"
               strokeDasharray={pathStyle.t.to((a) => {
@@ -206,22 +168,11 @@ function LineChart({ data }: LineChartProps) {
                   key={data[i].date.toString()}
                   cx={xScale(data[i].date)}
                   cy={yScale(data[i].avg_temp_F)}
-                  r={2}
+                  r={2.5}
                   fill="steelblue"
                 />
               );
             })}
-            {/* {data.map((d) => {
-              return (
-                <circle
-                  key={d.date.toString()}
-                  cx={xScale(d.date)}
-                  cy={yScale(d.avg_temp_F)}
-                  r={2}
-                  fill="steelblue"
-                />
-              );
-            })} */}
           </g>
           <g className="x-axis" transform={`translate(0, ${innerHeight})`}>
             <line x1={0} y1={0} x2={innerWidth} y2={0} stroke="steelblue" />

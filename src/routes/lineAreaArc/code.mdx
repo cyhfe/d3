@@ -1,3 +1,54 @@
+## 动画
+
+使用 React Spring 插值和 path 属性`strokeDasharray`实现
+
+网上找不到相关资料,只能根据文档折腾了老半天.最后效果还是不错的.
+
+[https://www.react-spring.dev/docs/advanced/interpolation](https://www.react-spring.dev/docs/advanced/interpolation)
+
+[https://observablehq.com/@d3/learn-d3-animation](https://observablehq.com/@d3/learn-d3-animation)
+
+```tsx
+// stroke-dasharray="${lineLength * t},${lineLength}"
+// lineLength从 DOM 获取. pathRef.current?.getTotalLength()
+
+<g className="path">
+  <animated.path
+    d={pathGenerator(data)}
+    fill="none"
+    stroke="white"
+    strokeWidth={2}
+    ref={pathRef}
+    strokeMiterlimit="1"
+    strokeDasharray={pathStyle.t.to((a) => {
+      const length = pathRef.current?.getTotalLength();
+      if (!length) return "";
+      return `${length * a} ${length}`;
+    })}
+  />
+</g>;
+
+// t: [0,1] 根据比例显示 path.
+//  使用spring 插值
+
+const pathApi = useSpringRef();
+const [pathStyle] = useSpring(
+  () => ({
+    ref: pathApi,
+    from: {
+      t: 0,
+    },
+    to: {
+      t,
+    },
+    config: {
+      duration: 1500,
+    },
+  }),
+  [t]
+);
+```
+
 ## React 渲染
 
 已经从 D3 渲染换到 React 渲染了,体验很棒.
