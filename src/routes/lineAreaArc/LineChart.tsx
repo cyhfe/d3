@@ -5,7 +5,14 @@ import { css } from "@emotion/react";
 
 import locale from "d3-time-format/locale/zh-CN";
 import { GradientOrangeRed } from "@visx/gradient";
-import { animated, useSpringRef, useTrail } from "@react-spring/web";
+import {
+  animated,
+  to,
+  useChain,
+  useSpring,
+  useSpringRef,
+  useTrail,
+} from "@react-spring/web";
 import { useEffect, useRef, useState } from "react";
 
 d3.timeFormatDefaultLocale(locale as d3.TimeLocaleDefinition);
@@ -70,11 +77,49 @@ function LineChart({ data }: LineChartProps) {
   });
 
   const pathRef = useRef<SVGPathElement | null>(null);
-  const [t, setT] = useState(0);
+  const [t, setT] = useState(1);
 
+  const pathApi = useSpringRef();
+  const [pathStyle] = useSpring(
+    () => ({
+      ref: pathApi,
+      from: {
+        t: 0,
+      },
+      to: {
+        t,
+      },
+      config: {
+        duration: 3000,
+      },
+    }),
+    [t]
+  );
+
+  // useChain([arcApi, pathApi], [0, 1], 1500);
+  const lengthRef = useRef<number>(0);
   useEffect(() => {
     arcApi.start();
   }, [arcApi]);
+
+  useEffect(() => {
+    pathApi.start();
+  }, [pathApi, t]);
+
+  useEffect(() => {
+    lengthRef.current = pathRef.current.getTotalLength();
+  }, [t]);
+
+  // useEffect(() => {
+  //   const length = pathRef.current.getTotalLength();
+  //   pathStyle.t.to((a) => {
+  //     console.log(a, "1", t);
+  //     const value = `${
+  //       pathRef.current?.getTotalLength() * a
+  //     },${pathRef.current?.getTotalLength()} `;
+  //     d3.select(pathRef.current).attr("stroke-dasharray", value);
+  //   });
+  // }, [pathStyle.t, t]);
 
   return (
     <div>
@@ -83,9 +128,15 @@ function LineChart({ data }: LineChartProps) {
         max={1}
         min={0}
         value={t}
-        onChange={(e) => setT(Number(e.target.value))}
-        step={0.01}
+        onChange={(e) => {
+          console.log(e.target.value);
+          setT(Number(e.target.value));
+        }}
+        step={0.1}
       />
+      <div>
+        <div>{t}</div>
+      </div>
       <ChartContainer
         viewWidth={width}
         viewHeight={height}
@@ -102,10 +153,40 @@ function LineChart({ data }: LineChartProps) {
           `}
         >
           <g className="area">
-            <path
-              onClick={() => {
-                console.log("click");
-              }}
+            <animated.path
+              // style={{
+              //   x: pathStyle.t.to((a) => {
+              //     console.log(a);
+              //     return a * 10;
+              //   }),
+              // }}
+              x={pathStyle.t.to((a) => {
+                // console.log(a);
+                return a * 10;
+              })}
+            >
+              {pathStyle.t.to((a) => {
+                // console.log(a);
+                return a;
+              })}
+            </animated.path>
+
+            <animated.path
+              strokeDasharray={pathStyle.t.to((a) => {
+                const length = pathRef.current?.getTotalLength();
+                console.log(length, lengthRef.current);
+                if (!length) return "";
+
+                return `${length * a} ${length}`;
+                // const value = `${
+                //   pathRef.current?.getTotalLength() * a
+                // },${pathRef.current?.getTotalLength()} `;
+                // return value;
+              })}
+              x={pathStyle.t.to((a) => {
+                console.log(a);
+                return a * 10;
+              })}
               d={areaGenerator(data)}
               fillOpacity={1}
               fill="url(#orange)"
@@ -113,15 +194,12 @@ function LineChart({ data }: LineChartProps) {
             />
           </g>
           <g className="path">
-            <path
+            <animated.path
               d={pathGenerator(data)}
               fill="none"
               stroke="white"
               ref={pathRef}
               strokeMiterlimit="1"
-              strokeDasharray={`${
-                pathRef.current?.getTotalLength() * t
-              },${pathRef.current?.getTotalLength()}`}
             />
           </g>
           <g className="arc">
