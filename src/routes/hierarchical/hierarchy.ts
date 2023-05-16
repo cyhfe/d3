@@ -1,8 +1,14 @@
 import * as d3 from "d3";
-import { Flat, Node, TreeNode } from "./types";
-export function CSVToHierarchy(data: Flat) {
+import { Flat, TreeNode } from "./types";
+export function CSVToHierarchy(
+  data: Flat[]
+): [
+  d3.HierarchyNode<Flat>,
+  d3.HierarchyNode<Flat>[],
+  d3.HierarchyNode<Flat>[]
+] {
   const hierarchyGenerator = d3
-    .stratify<Node>()
+    .stratify<Flat>()
     .id((d) => d.child)
     .parentId((d) => d.parent);
 
@@ -17,6 +23,5 @@ export function JSONToHierarchy(data: TreeNode) {
 
   const descendants = root.descendants();
   const leaves = root.leaves();
-  debugger;
   return [root, descendants, leaves];
 }

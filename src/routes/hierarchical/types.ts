@@ -1,5 +1,4 @@
-export type Flat = Node[];
-export interface Node {
+export interface Flat {
   child: string;
   parent?: string;
   total_speakers?: number;

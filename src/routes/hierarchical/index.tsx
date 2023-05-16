@@ -1,24 +1,25 @@
 import React, { useEffect, useState } from "react";
 import * as d3 from "d3";
-import { CSVToHierarchy, JSONToHierarchy } from "./hierarchy";
-import { Flat, TreeNode } from "./types";
+import { CSVToHierarchy } from "./hierarchy";
+import { Flat } from "./types";
 function Hierachical() {
-  const [flat, setFlat] = useState<Flat | null>(null);
-  const [tree, setTree] = useState<TreeNode | null>(null);
+  const [data, setData] = useState<
+    | [
+        d3.HierarchyNode<Flat>,
+        d3.HierarchyNode<Flat>[],
+        d3.HierarchyNode<Flat>[]
+      ]
+    | null
+  >(null);
+
   useEffect(() => {
     async function getData() {
       const flat = (await d3.csv(
         "data/hierarchical/flat_data.csv",
         d3.autoType
-      )) as Flat;
-      const tree = (await d3.json(
-        "data/hierarchical/hierarchical-data.json"
-      )) as TreeNode;
-
-      // console.log(flat);
-      console.log(tree);
-      CSVToHierarchy(flat);
-      JSONToHierarchy(tree);
+      )) as Flat[];
+      const data = CSVToHierarchy(flat);
+      setData(data);
     }
 
     getData();
