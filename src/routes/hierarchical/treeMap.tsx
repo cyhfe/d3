@@ -17,8 +17,12 @@ function TreeMap({ data }: CirclePackProps) {
   treeLayoutGenerator(root);
 
   const linkGenerator = d3
-    .link(d3.curveBumpX)
-    .x((d) => d.y)
+    .link<d3.HierarchyLink<Flat>, d3.HierarchyNode<Flat> & Layout>(
+      d3.curveBumpX
+    )
+    .x((d) => {
+      return d.y;
+    })
     .y((d) => d.x);
 
   const links = root.links();
@@ -53,7 +57,7 @@ function TreeMap({ data }: CirclePackProps) {
                 );
               })}
 
-              {descendants.map((d) => {
+              {descendants.map((d: d3.HierarchyNode<Flat> & Layout) => {
                 return (
                   <circle
                     cx={d.y}
@@ -72,7 +76,7 @@ function TreeMap({ data }: CirclePackProps) {
                 );
               })}
 
-              {descendants.map((d) => {
+              {descendants.map((d: d3.HierarchyNode<Flat> & Layout) => {
                 return (
                   <text
                     x={d.children ? d.y - 8 : d.y + 8}

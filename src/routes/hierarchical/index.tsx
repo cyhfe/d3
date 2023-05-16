@@ -23,8 +23,8 @@ function Hierachical() {
     <div>
       {data && (
         <>
-          {/* <CirclePack data={data} /> */}
           <TreeMap data={data} />
+          <CirclePack data={data} />
         </>
       )}
     </div>
