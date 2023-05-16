@@ -1,6 +1,14 @@
-export interface Data {
-  letter: string;
-  frequency: number;
+export type Flat = Node[];
+export interface Node {
+  child: string;
+  parent?: string;
+  total_speakers?: number;
+  native_speakers?: number;
 }
 
-export type DataList = Data[];
+export interface TreeNode {
+  name: string;
+  native_speakers?: number;
+  total_speakers?: number;
+  children?: TreeNode[];
+}
