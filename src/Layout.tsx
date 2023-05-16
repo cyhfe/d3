@@ -28,10 +28,10 @@ const menuItemList = [
     to: "/hierarchical",
     label: "hierarchical",
   },
-  {
-    to: "/network",
-    label: "network",
-  },
+  // {
+  //   to: "/network",
+  //   label: "network",
+  // },
   {
     to: "/state-of-js",
     label: "state-of-js",
