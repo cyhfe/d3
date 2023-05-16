@@ -1,16 +1,11 @@
 import React, { useEffect, useState } from "react";
 import * as d3 from "d3";
 import { CSVToHierarchy } from "./hierarchy";
-import { Flat } from "./types";
+import { Data, Flat } from "./types";
+import CirclePack from "./CirclePack";
+import TreeMap from "./treeMap";
 function Hierachical() {
-  const [data, setData] = useState<
-    | [
-        d3.HierarchyNode<Flat>,
-        d3.HierarchyNode<Flat>[],
-        d3.HierarchyNode<Flat>[]
-      ]
-    | null
-  >(null);
+  const [data, setData] = useState<Data | null>(null);
 
   useEffect(() => {
     async function getData() {
@@ -23,8 +18,17 @@ function Hierachical() {
     }
 
     getData();
-  });
-  return <div>Hierachical</div>;
+  }, []);
+  return (
+    <div>
+      {data && (
+        <>
+          {/* <CirclePack data={data} /> */}
+          <TreeMap data={data} />
+        </>
+      )}
+    </div>
+  );
 }
 
 export default Hierachical;
