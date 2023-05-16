@@ -25,6 +25,14 @@ const menuItemList = [
     label: "map",
   },
   {
+    to: "/hierarchical",
+    label: "hierarchical",
+  },
+  {
+    to: "/network",
+    label: "network",
+  },
+  {
     to: "/state-of-js",
     label: "state-of-js",
   },

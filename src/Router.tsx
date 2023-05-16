@@ -14,6 +14,8 @@ import Think from "./routes/think.mdx";
 import Home from "./routes/Home.mdx";
 import LineAreaArc from "./routes/lineAreaArc";
 import Map from "./routes/map";
+import Network from "./routes/network";
+import Hierarchical from "./routes/hierarchical";
 
 const router = createBrowserRouter([
   {
@@ -67,6 +69,14 @@ const router = createBrowserRouter([
       {
         path: "/map",
         element: <Map />,
+      },
+      {
+        path: "/hierarchical",
+        element: <Hierarchical />,
+      },
+      {
+        path: "/network",
+        element: <Network />,
       },
     ],
   },
