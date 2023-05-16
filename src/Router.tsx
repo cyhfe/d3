@@ -74,10 +74,10 @@ const router = createBrowserRouter([
         path: "/hierarchical",
         element: <Hierarchical />,
       },
-      {
-        path: "/network",
-        element: <Network />,
-      },
+      // {
+      //   path: "/network",
+      //   element: <Network />,
+      // },
     ],
   },
   {

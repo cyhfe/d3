@@ -29,12 +29,6 @@ function CirclePack({ data }: CirclePackProps) {
               viewWidth={width}
               margin={margin}
             >
-              <rect
-                width={innerWidth}
-                height={innerHeight}
-                stroke="red"
-                fill="none"
-              />
               {descendants.map((d: d3.HierarchyNode<Flat> & Layout) => {
                 function getColor(d: d3.HierarchyNode<Flat> & Layout): string {
                   switch (d.depth) {
@@ -51,9 +45,8 @@ function CirclePack({ data }: CirclePackProps) {
                 }
                 const fill = getColor(d);
                 return (
-                  <g>
+                  <g key={d.id}>
                     <circle
-                      key={d.id}
                       cx={d.x}
                       cy={d.y}
                       r={d.r}

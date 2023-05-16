@@ -10,7 +10,7 @@ function TreeMap({ data }: CirclePackProps) {
   const margin = { top: 60, right: 200, bottom: 0, left: 100 };
   const innerWidth = width - margin.left - margin.right;
   const innerHeight = height - margin.top - margin.bottom;
-  // debugger;
+
   const [root, descendants, leaves] = data;
 
   const treeLayoutGenerator = d3.tree().size([innerHeight, innerWidth]);
@@ -40,15 +40,10 @@ function TreeMap({ data }: CirclePackProps) {
               viewWidth={width}
               margin={margin}
             >
-              <rect
-                width={innerWidth}
-                height={innerHeight}
-                stroke="red"
-                fill="none"
-              />
-              {links.map((link) => {
+              {links.map((link, i) => {
                 return (
                   <path
+                    key={i}
                     d={linkGenerator(link)}
                     fill="none"
                     stroke="gray"
@@ -60,6 +55,7 @@ function TreeMap({ data }: CirclePackProps) {
               {descendants.map((d: d3.HierarchyNode<Flat> & Layout) => {
                 return (
                   <circle
+                    key={d.id}
                     cx={d.y}
                     cy={d.x}
                     r={
@@ -79,6 +75,7 @@ function TreeMap({ data }: CirclePackProps) {
               {descendants.map((d: d3.HierarchyNode<Flat> & Layout) => {
                 return (
                   <text
+                    key={d.id}
                     x={d.children ? d.y - 8 : d.y + 8}
                     y={d.x}
                     textAnchor={d.children ? "end" : "start"}

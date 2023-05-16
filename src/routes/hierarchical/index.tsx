@@ -4,6 +4,7 @@ import { CSVToHierarchy } from "./hierarchy";
 import { Data, Flat } from "./types";
 import CirclePack from "./CirclePack";
 import TreeMap from "./treeMap";
+import Post from "./post.mdx";
 function Hierachical() {
   const [data, setData] = useState<Data | null>(null);
 
@@ -25,6 +26,7 @@ function Hierachical() {
         <>
           <TreeMap data={data} />
           <CirclePack data={data} />
+          <Post />
         </>
       )}
     </div>

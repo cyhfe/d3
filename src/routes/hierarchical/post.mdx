@@ -1,100 +1,198 @@
+一开始以为很复杂,其实要做的工作很少.
+D3 真的太强大了.
+
+#### 树形图流程
+
+<img width="600px" src="assets/1.png" />
+
+<hr />
+
+<img width="600px" src="assets/2.png" />
+
+#### treeMap
+
 ```tsx
-import React, { useEffect, useRef, useState } from "react";
-import * as d3 from "d3";
+import { CirclePackProps, Flat, Layout } from "./types";
 import ChartContainer from "../../components/ChartContainer";
-import { Card, CardContent, css } from "@mui/material";
-import type { Data, DataList } from "./types";
+import { Box, Card, CardContent } from "@mui/material";
+import * as d3 from "d3";
+import { colorScale, getRadius } from "./scale";
 
-const width = 640;
-const height = 400;
-const margin = {
-  top: 20,
-  right: 20,
-  bottom: 30,
-  left: 40,
-};
+function TreeMap({ data }: CirclePackProps) {
+  const width = 1200;
+  const height = 3000;
+  const margin = { top: 60, right: 200, bottom: 0, left: 100 };
+  const innerWidth = width - margin.left - margin.right;
+  const innerHeight = height - margin.top - margin.bottom;
 
-const innerWidth = width - margin.left - margin.right;
-const innerHeight = height - margin.top - margin.bottom;
+  const [root, descendants, leaves] = data;
 
-interface BarChartProps {
-  data: DataList;
-}
+  const treeLayoutGenerator = d3.tree().size([innerHeight, innerWidth]);
+  treeLayoutGenerator(root);
 
-function BarChart({ data }: BarChartProps) {
-  const groupRef = useRef<SVGGElement>(null);
-  useEffect(() => {
-    function updateChart(data?: DataList) {
-      if (!data || !groupRef.current) return;
-      const sortedData = d3.sort(data, (a, b) =>
-        d3.descending(a.frequency, b.frequency)
-      );
+  const linkGenerator = d3
+    .link<d3.HierarchyLink<Flat>, d3.HierarchyNode<Flat> & Layout>(
+      d3.curveBumpX
+    )
+    .x((d) => {
+      return d.y;
+    })
+    .y((d) => d.x);
 
-      const xDomain = sortedData.map((d) => d.letter);
-      const yDomain = [0, d3.max(data, (d) => d.frequency)];
-
-      const xScale = d3.scaleBand(xDomain, [0, innerWidth]).padding(0.1);
-      const yScale = d3.scaleLinear(yDomain, [innerHeight, 0]);
-
-      const xAxisGenerator = d3.axisBottom(xScale).tickSizeOuter(0);
-      const yAxisGenerator = d3.axisLeft(yScale).ticks(innerHeight / 40, "%");
-      const rootGroup = d3.select(groupRef.current);
-      const barsGroup = rootGroup.append("g");
-
-      barsGroup
-        .selectAll<SVGSVGElement, Data>("rect")
-        .data(sortedData, (d) => d.letter)
-        .join("rect")
-        .attr("x", (d) => xScale(d.letter))
-        .attr("y", (d) => yScale(d.frequency))
-        .attr("width", () => xScale.bandwidth())
-        .attr("height", (d) => innerHeight - yScale(d.frequency))
-        .attr("fill", "steelblue");
-
-      rootGroup
-        .append("g")
-        .call(xAxisGenerator)
-        .attr("transform", `translate(0, ${innerHeight})`);
-
-      rootGroup
-        .append("g")
-        .call(yAxisGenerator)
-        .call((g) => g.select(".domain").remove())
-        .call((g) =>
-          g
-            .selectAll(".tick line")
-            .clone()
-            .attr("x2", innerWidth)
-            .attr("stroke-opacity", 0.1)
-        )
-        .call((g) =>
-          g
-            .append("text")
-            .attr("x", -margin.left + 4)
-            .attr("y", -margin.top + 4)
-            .attr("alignment-baseline", "hanging")
-            .attr("fill", "black")
-            .attr("text-anchor", "start")
-            .text("↑ Frequency")
-        );
-
-      return () => {
-        barsGroup.remove();
-      };
-    }
-    const remove = updateChart(data);
-
-    return () => {
-      remove();
-    };
-  }, [data]);
-
+  const links = root.links();
+  const maxSpeakers = d3.max(leaves, (d) => d.data.total_speakers);
   return (
-    <ChartContainer width={width} height={height} margin={margin}>
-      <g ref={groupRef}></g>
-    </ChartContainer>
+    <div>
+      <Card>
+        <CardContent>
+          <Box
+            mb={4}
+            sx={{ maxWidth: " 720px", marginLeft: "auto", marginRight: "auto" }}
+          >
+            <ChartContainer
+              viewHeight={height}
+              viewWidth={width}
+              margin={margin}
+            >
+              {links.map((link, i) => {
+                return (
+                  <path
+                    key={i}
+                    d={linkGenerator(link)}
+                    fill="none"
+                    stroke="gray"
+                    strokeOpacity={0.6}
+                  />
+                );
+              })}
+
+              {descendants.map((d: d3.HierarchyNode<Flat> & Layout) => {
+                return (
+                  <circle
+                    key={d.id}
+                    cx={d.y}
+                    cy={d.x}
+                    r={
+                      d.depth === 3
+                        ? getRadius(maxSpeakers, d.data.total_speakers)
+                        : 4
+                    }
+                    fill={
+                      d.depth === 3 ? colorScale(d.parent.data.parent) : "white"
+                    }
+                    fillOpacity={d.depth === 3 ? 0.3 : 1}
+                    stroke={d.depth === 3 ? "none" : "grey"}
+                  />
+                );
+              })}
+
+              {descendants.map((d: d3.HierarchyNode<Flat> & Layout) => {
+                return (
+                  <text
+                    key={d.id}
+                    x={d.children ? d.y - 8 : d.y + 8}
+                    y={d.x}
+                    textAnchor={d.children ? "end" : "start"}
+                    alignmentBaseline="middle"
+                    paintOrder={"stroke"}
+                    fontSize={16}
+                  >
+                    {d.id}
+                  </text>
+                );
+              })}
+            </ChartContainer>
+          </Box>
+        </CardContent>
+      </Card>
+    </div>
   );
 }
 
-export default BarChart;
+export default TreeMap;
+```
+
+```tsx
+import { CirclePackProps, Flat, Layout } from "./types";
+import ChartContainer from "../../components/ChartContainer";
+import { Box, Card, CardContent } from "@mui/material";
+import * as d3 from "d3";
+import { colorScale } from "./scale";
+function CirclePack({ data }: CirclePackProps) {
+  const width = 800;
+  const height = 800;
+  const margin = { top: 1, right: 1, bottom: 1, left: 1 };
+  const innerWidth = width - margin.right - margin.left;
+  const innerHeight = height - margin.top - margin.bottom;
+  // debugger;
+  const [root, descendants, leaves] = data;
+
+  root.sum((d) => d.total_speakers);
+  const packLayoutGenerator = d3.pack().size([innerWidth, innerHeight]);
+  packLayoutGenerator(root);
+
+  return (
+    <div>
+      <Card>
+        <CardContent>
+          <Box
+            mb={4}
+            sx={{ maxWidth: " 720px", marginLeft: "auto", marginRight: "auto" }}
+          >
+            <ChartContainer
+              viewHeight={height}
+              viewWidth={width}
+              margin={margin}
+            >
+              {descendants.map((d: d3.HierarchyNode<Flat> & Layout) => {
+                function getColor(d: d3.HierarchyNode<Flat> & Layout): string {
+                  switch (d.depth) {
+                    case 1:
+                      return colorScale(d.id);
+                    case 2:
+                      return d3.interpolate(
+                        colorScale(d.parent.id),
+                        "white"
+                      )(0.5);
+                    default:
+                      return "white";
+                  }
+                }
+                const fill = getColor(d);
+                return (
+                  <g key={d.id}>
+                    <circle
+                      cx={d.x}
+                      cy={d.y}
+                      r={d.r}
+                      fill={fill}
+                      stroke={d.depth === 0 ? "grey" : "none"}
+                    />
+                  </g>
+                );
+              })}
+              {leaves.map((d: d3.HierarchyNode<Flat> & Layout) => {
+                return (
+                  d.r > 40 && (
+                    <text
+                      key={d.id}
+                      x={d.x}
+                      y={d.y}
+                      textAnchor="middle"
+                      alignmentBaseline="central"
+                    >
+                      {d.id}
+                    </text>
+                  )
+                );
+              })}
+            </ChartContainer>
+          </Box>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
+
+export default CirclePack;
 ```
